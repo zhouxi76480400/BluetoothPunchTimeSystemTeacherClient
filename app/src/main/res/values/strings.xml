@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">BluetoothPunchTimeSystemTeacherClient</string>
+    <string name="set_students">Set Students</string>
+    
 </resources>
