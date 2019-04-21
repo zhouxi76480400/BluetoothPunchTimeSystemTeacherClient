@@ -1,4 +1,4 @@
-package org.group.bluetoothpunchtimesystemteacherclient.activitys;
+package org.group.bluetoothpunchtimesystemteacherclient.activities;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

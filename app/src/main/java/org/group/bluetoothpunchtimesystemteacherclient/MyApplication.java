@@ -1,11 +1,9 @@
 package org.group.bluetoothpunchtimesystemteacherclient;
 
-import android.app.ActivityManager;
 import android.app.Application;
-import android.content.Context;
 import android.content.Intent;
 
-import org.group.bluetoothpunchtimesystemteacherclient.activitys.ExitActivity;
+import org.group.bluetoothpunchtimesystemteacherclient.activities.ExitActivity;
 
 public class MyApplication extends Application {
 

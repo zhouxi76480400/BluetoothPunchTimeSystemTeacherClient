@@ -1,11 +1,20 @@
 <resources>
     <string name="app_name">BluetoothPunchTimeSystemTeacherClient</string>
-    <string name="set_students">Set Students</string>
+    <string name="set_students">All Students</string>
     <string name="system_permission">System Permission</string>
     <string name="no_bt_permission">No Bluetooth Permission</string>
     <string name="system_hardware">System Hardware</string>
     <string name="no_bluetooth_hardware">No Bluetooth Hardware</string>
+    <string name="not_turn_on_the_bt_notification">Your Bluetooth is off, make sure your Bluetooth is on.</string>
+    <string name="to_turn_on_bt">Go to turn on</string>
+    <string name="back">Back</string>
+    <string name="retry">Retry</string>
     <string name="ok">OK</string>
+    <string name="add_a_student">Add a student</string>
+    <string name="input_mac_address">Input Student\'s MAC Address</string>
+    <string name="scan">Scan</string>
+    <string name="no_permissions_hint">This application need follow permissions, please grant it.</string>
+    <string name="exit">Exit</string>
 
 
 </resources>
