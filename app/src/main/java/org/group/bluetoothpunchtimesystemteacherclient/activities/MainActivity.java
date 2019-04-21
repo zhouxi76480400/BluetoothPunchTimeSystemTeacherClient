@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import org.group.bluetoothpunchtimesystemteacherclient.MyApplication;
 import org.group.bluetoothpunchtimesystemteacherclient.R;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -83,10 +84,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_PERMISSION_CODE:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                } else {
-                    showNoPermissionsDialog();
+                if (grantResults.length > 0) {
+                    boolean isGranted = true;
+                    for(int grantResult : grantResults) {
+                        if(isGranted) {
+                            if(grantResult != PermissionChecker.PERMISSION_GRANTED) {
+                                isGranted = false;
+                            }
+                        }
+                    }
+                    if(!isGranted) {
+                        showNoPermissionsDialog();
+                    }
                 }
                 return;
         }
@@ -96,7 +105,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                if(which == DialogInterface.BUTTON_POSITIVE) {
+                    checkPermission();
+                }else if (which == DialogInterface.BUTTON_NEGATIVE) {
+                    MyApplication.getInstance().exit();
+                }
             }
         };
         AlertDialog alertDialog = new AlertDialog.Builder(this)
