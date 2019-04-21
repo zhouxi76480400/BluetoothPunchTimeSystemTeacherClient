@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">BluetoothPunchTimeSystemTeacherClient</string>
     <string name="set_students">Set Students</string>
-    
+    <string name="system_permission">System Permission</string>
+    <string name="no_bt_permission">No Bluetooth Permission</string>
+    <string name="system_hardware">System Hardware</string>
+    <string name="no_bluetooth_hardware">No Bluetooth Hardware</string>
+    <string name="ok">OK</string>
+
+
 </resources>
