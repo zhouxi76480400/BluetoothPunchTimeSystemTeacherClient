@@ -1,120 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ll_main"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <include layout="@layout/layout_action_bar"/>
 
-    <ScrollView
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
-            android:gravity="bottom"
-            android:orientation="vertical"
+        <ScrollView
+            android:id="@+id/scroll_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
+            android:layout_height="match_parent">
 
             <LinearLayout
-                android:layout_margin="@dimen/default_margin"
+                android:gravity="bottom"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:orientation="horizontal"
                 android:layout_height="wrap_content">
 
+
+                <LinearLayout
+                    android:layout_margin="@dimen/default_margin"
+                    android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_height="wrap_content">
+
+                    <android.support.design.widget.TextInputLayout
+                        app:counterEnabled="true"
+                        app:counterMaxLength="@integer/mac_address_length"
+                        android:id="@+id/til_mac_addr"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content">
+
+                        <EditText
+                            android:imeOptions="actionNext"
+                            android:singleLine="true"
+                            android:digits="@string/number_and_hex_char"
+                            android:maxLength="@integer/mac_address_length"
+                            android:hint="@string/input_mac_address"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.v7.widget.AppCompatButton
+                        android:theme="@style/MyButtonColor"
+                        android:id="@+id/btn_scan"
+                        android:layout_gravity="bottom"
+                        android:text="@string/scan"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
                 <android.support.design.widget.TextInputLayout
+                    android:layout_margin="@dimen/default_margin"
                     app:counterEnabled="true"
-                    app:counterMaxLength="@integer/mac_address_length"
-                    android:id="@+id/til_mac_addr"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
+                    app:counterMaxLength="@integer/student_number_length"
+                    android:id="@+id/til_student_number"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <EditText
                         android:imeOptions="actionNext"
                         android:singleLine="true"
-                        android:digits="@string/number_and_hex_char"
-                        android:maxLength="@integer/mac_address_length"
-                        android:hint="@string/input_mac_address"
+                        android:inputType="numberDecimal"
+                        android:digits="@string/number_only"
+                        android:maxLength="@integer/student_number_length"
+                        android:hint="@string/input_student_number"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
                 </android.support.design.widget.TextInputLayout>
 
-                <android.support.v7.widget.AppCompatButton
-                    android:theme="@style/MyButtonColor"
-                    android:id="@+id/btn_scan"
-                    android:layout_gravity="bottom"
-                    android:text="@string/scan"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                <android.support.design.widget.TextInputLayout
+                    android:layout_margin="@dimen/default_margin"
+                    app:counterEnabled="true"
+                    app:counterMaxLength="@integer/name_length"
+                    android:id="@+id/til_last_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:imeOptions="actionNext"
+                        android:singleLine="true"
+                        android:inputType="textPersonName"
+                        android:maxLength="@integer/name_length"
+                        android:hint="@string/input_last_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_margin="@dimen/default_margin"
+                    app:counterEnabled="true"
+                    app:counterMaxLength="@integer/name_length"
+                    android:id="@+id/til_first_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:singleLine="true"
+                        android:inputType="textPersonName"
+                        android:maxLength="@integer/name_length"
+                        android:hint="@string/input_first_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </android.support.design.widget.TextInputLayout>
 
             </LinearLayout>
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_margin="@dimen/default_margin"
-                app:counterEnabled="true"
-                app:counterMaxLength="@integer/student_number_length"
-                android:id="@+id/til_student_number"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+        </ScrollView>
 
-                <EditText
-                    android:imeOptions="actionNext"
-                    android:singleLine="true"
-                    android:inputType="numberDecimal"
-                    android:digits="@string/number_only"
-                    android:maxLength="@integer/student_number_length"
-                    android:hint="@string/input_student_number"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+        <ProgressBar
+            android:id="@+id/progress"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_margin="@dimen/default_margin"
-                app:counterEnabled="true"
-                app:counterMaxLength="@integer/name_length"
-                android:id="@+id/til_last_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:imeOptions="actionNext"
-                    android:singleLine="true"
-                    android:inputType="textPersonName"
-                    android:maxLength="@integer/name_length"
-                    android:hint="@string/input_last_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_margin="@dimen/default_margin"
-                app:counterEnabled="true"
-                app:counterMaxLength="@integer/name_length"
-                android:id="@+id/til_first_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:singleLine="true"
-                    android:inputType="textPersonName"
-                    android:maxLength="@integer/name_length"
-                    android:hint="@string/input_first_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-            </android.support.design.widget.TextInputLayout>
-
-
-
-        </LinearLayout>
-
-
-    </ScrollView>
+    </FrameLayout>
 
 </LinearLayout>
