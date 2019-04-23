@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="mac_address_length">12</integer>
+    <integer name="student_number_length">15</integer>
+    <integer name="name_length">20</integer>
 
 </resources>
