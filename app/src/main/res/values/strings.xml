@@ -31,5 +31,8 @@
     <string name="student_management">Student Management</string>
     <string name="remove_students">Remove Student(s)</string>
     <string name="search">Search</string>
+    <string name="done">Done</string>
+    <string name="select_users_to_remove">Select User(s) To Remove</string>
+
 
 </resources>

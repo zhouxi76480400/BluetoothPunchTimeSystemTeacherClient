@@ -2,6 +2,7 @@ package org.group.bluetoothpunchtimesystemteacherclient.activities;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -13,19 +14,25 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 
 import org.group.bluetoothpunchtimesystemteacherclient.MyApplication;
 import org.group.bluetoothpunchtimesystemteacherclient.R;
 
-public class SetStudentsActivity extends AppCompatActivity implements MenuItem.OnActionExpandListener {
+public class SetStudentsActivity extends AppCompatActivity implements
+        MenuItem.OnActionExpandListener, ActionMode.Callback, SearchView.OnQueryTextListener {
 
     public static final int TURN_ON_BLUETOOTH_REQUEST_CODE = 0x000001;
 
@@ -34,6 +41,8 @@ public class SetStudentsActivity extends AppCompatActivity implements MenuItem.O
     private RecyclerView recycler_view;
 
     private ProgressBar progress;
+
+    private ActionMode actionMode;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,6 +57,8 @@ public class SetStudentsActivity extends AppCompatActivity implements MenuItem.O
 
     private MenuItem menu_item_search_item;
 
+    private SearchView searchView;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_set_students, menu);
@@ -57,7 +68,14 @@ public class SetStudentsActivity extends AppCompatActivity implements MenuItem.O
         menu_item_search_item = menu.findItem(R.id.menu_search);
         menu_item_search_item.setOnActionExpandListener(this);
 
-        SearchView searchView = (SearchView) menu_item_search_item.getActionView();
+        searchView = (SearchView) menu_item_search_item.getActionView();
+        searchView.setInputType(InputType.TYPE_CLASS_TEXT);
+        searchView.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+        searchView.setOnQueryTextListener(this);
+        searchView.setIconifiedByDefault(true);
+        searchView.setFocusable(true);
+        searchView.setIconified(false);
+        searchView.requestFocusFromTouch();
 //        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
 //            @Override
 //            public boolean onClose() {
@@ -72,11 +90,47 @@ public class SetStudentsActivity extends AppCompatActivity implements MenuItem.O
         return true;
     }
 
+    private void showActionMode() {
+        if(actionMode == null) {
+            actionMode = startSupportActionMode(this);
+        }
+
+    }
+
+    @Override
+    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+        actionMode.getMenuInflater().inflate(R.menu.menu_action_mode_remove_users,menu);
+        actionMode.setTitle(getString(R.string.select_users_to_remove));
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+        if(menuItem.getItemId() == R.id.menu_remove_users_ok) {
+            actionMode.finish();
+            removeUsersFromServer();
+        }
+        return true;
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode actionMode) {
+        this.actionMode = null;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_add_user:
                 gotoAddAStudentActivity();
+                return true;
+            case R.id.menu_remove_user:
+                showActionMode();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -195,14 +249,6 @@ public class SetStudentsActivity extends AppCompatActivity implements MenuItem.O
         }
     }
 
-    /**
-     * need request network to download all student data
-     */
-    private void readAllUsersDataFromServer() {
-
-
-    }
-
     private void gotoAddAStudentActivity() {
         Intent intent = new Intent(this,AddAStudentActivity.class);
         startActivity(intent);
@@ -230,5 +276,41 @@ public class SetStudentsActivity extends AppCompatActivity implements MenuItem.O
             menu_item_search_item.setVisible(true);
         }
         return true;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String s) {
+        Log.e("test",s);
+
+        if(searchView != null) {
+            InputMethodManager inputMethodManager =
+                    (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if(inputMethodManager != null) {
+                inputMethodManager.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+            }
+            searchView.clearFocus();
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String s) {
+//        Log.e("test",s);
+        return true;
+    }
+
+    /**
+     * need request network to download all student data
+     */
+    private void readAllUsersDataFromServer() {
+
+
+    }
+
+    /**
+     * must push to server
+     */
+    private void removeUsersFromServer() {
+
     }
 }
