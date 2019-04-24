@@ -79,11 +79,12 @@ public class BluetoothScanActivity extends AppCompatActivity implements
         bluetoothListAdapter = new BluetoothListAdapter(this,list);
         bluetoothListAdapter.setBluetoothDeviceSelectedListener(this);
         recyclerView.setAdapter(bluetoothListAdapter);
+    }
 
-
-
-
-
+    @Override
+    protected void onDestroy() {
+        stopScan();
+        super.onDestroy();
     }
 
     @Override
@@ -145,11 +146,16 @@ public class BluetoothScanActivity extends AppCompatActivity implements
     }
 
     public void scan() {
+        stopScan();
+        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+        adapter.startDiscovery();
+    }
+
+    private void stopScan() {
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         if(adapter.isDiscovering()) {
             adapter.cancelDiscovery();
         }
-        adapter.startDiscovery();
     }
 
     @Override

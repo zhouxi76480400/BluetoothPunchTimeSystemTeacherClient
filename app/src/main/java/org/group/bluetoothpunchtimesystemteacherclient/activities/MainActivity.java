@@ -13,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -25,11 +27,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public static final int REQUEST_PERMISSION_CODE = 0x0000011;
 
-    private Toolbar toolbar;
-
-    private LinearLayout ll_show_all_session, ll_start_new_session, ll_cv_set_students;
-
-    @Override
+     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -37,14 +35,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         checkPermission();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_add_user:
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     private void initView() {
-        toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        ll_show_all_session = findViewById(R.id.ll_show_all_session);
+        LinearLayout ll_show_all_session = findViewById(R.id.ll_show_all_session);
         ll_show_all_session.setOnClickListener(this);
-        ll_start_new_session = findViewById(R.id.ll_start_new_session);
+        LinearLayout ll_start_new_session = findViewById(R.id.ll_start_new_session);
         ll_start_new_session.setOnClickListener(this);
-        ll_cv_set_students = findViewById(R.id.ll_cv_set_students);
+        LinearLayout ll_cv_set_students = findViewById(R.id.ll_cv_set_students);
         ll_cv_set_students.setOnClickListener(this);
 
 
@@ -53,7 +68,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void checkPermission() {
         String [] permissions = null;
-
         try {
             PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_PERMISSIONS);
             if(info.requestedPermissions != null) {
@@ -62,9 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-
         AtomicBoolean needRequestPermission = new AtomicBoolean(false);
-
         for (String permission : permissions) {
             if(!needRequestPermission.get()) {
                 int havePermission = PermissionChecker.

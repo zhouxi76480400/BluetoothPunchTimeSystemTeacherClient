@@ -8,13 +8,16 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.PermissionChecker;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import org.group.bluetoothpunchtimesystemteacherclient.MyApplication;
 import org.group.bluetoothpunchtimesystemteacherclient.R;
@@ -23,12 +26,17 @@ public class SetStudentsActivity extends AppCompatActivity {
 
     public static final int TURN_ON_BLUETOOTH_REQUEST_CODE = 0x000001;
 
+    private SwipeRefreshLayout refresh_layout;
+
+    private RecyclerView recycler_view;
+
+    private ProgressBar progress;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_students);
         initView();
-
     }
 
     @Override
@@ -61,6 +69,12 @@ public class SetStudentsActivity extends AppCompatActivity {
                 SetStudentsActivity.this.finish();
             }
         });
+        refresh_layout = findViewById(R.id.refresh_layout);
+        refresh_layout.setColorSchemeColors(getColor(R.color.colorAccent));
+        recycler_view = findViewById(R.id.recycler_view);
+        progress = findViewById(R.id.progress);
+        progress.setVisibility(View.GONE);
+
 
 
 

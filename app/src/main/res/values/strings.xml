@@ -28,5 +28,6 @@
     <string name="student_number">Student Number</string>
     <string name="student_data_not_filled_hint">You should filled all data before add, please check follow input field.(%s)</string>
     <string name="edit_student_information">Edit Student Information</string>
+    <string name="student_management">Student Management</string>
 
 </resources>
