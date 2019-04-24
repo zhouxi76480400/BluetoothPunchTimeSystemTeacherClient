@@ -1,7 +1,7 @@
 <resources>
     <string name="number_only">0123456789</string>
     <string name="number_and_hex_char">0123456789ABCDEFabcdef</string>
-    <string name="app_name">BluetoothPunchTimeSystemTeacherClient</string>
+    <string name="app_name">BluetoothPunchTimeSystem</string>
     <string name="set_students">All Students</string>
     <string name="system_permission">System Permission</string>
     <string name="no_bt_permission">No Bluetooth Permission</string>
@@ -29,5 +29,7 @@
     <string name="student_data_not_filled_hint">You should filled all data before add, please check follow input field.(%s)</string>
     <string name="edit_student_information">Edit Student Information</string>
     <string name="student_management">Student Management</string>
+    <string name="remove_students">Remove Student(s)</string>
+    <string name="search">Search</string>
 
 </resources>

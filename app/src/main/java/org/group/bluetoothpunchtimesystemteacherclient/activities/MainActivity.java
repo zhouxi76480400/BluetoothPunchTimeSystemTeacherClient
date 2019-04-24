@@ -44,8 +44,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_add_user:
-
+            case R.id.menu_exit:
+                MyApplication.getInstance().exit();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

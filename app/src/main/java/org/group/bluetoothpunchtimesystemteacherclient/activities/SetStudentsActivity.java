@@ -8,12 +8,15 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.PermissionChecker;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +25,7 @@ import android.widget.ProgressBar;
 import org.group.bluetoothpunchtimesystemteacherclient.MyApplication;
 import org.group.bluetoothpunchtimesystemteacherclient.R;
 
-public class SetStudentsActivity extends AppCompatActivity {
+public class SetStudentsActivity extends AppCompatActivity implements MenuItem.OnActionExpandListener {
 
     public static final int TURN_ON_BLUETOOTH_REQUEST_CODE = 0x000001;
 
@@ -39,9 +42,33 @@ public class SetStudentsActivity extends AppCompatActivity {
         initView();
     }
 
+    private MenuItem menu_item_add_user;
+
+    private MenuItem menu_item_remove_user;
+
+    private MenuItem menu_item_search_item;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_set_students, menu);
+        menu_item_add_user = menu.findItem(R.id.menu_add_user);
+        menu_item_remove_user = menu.findItem(R.id.menu_remove_user);
+        menu_item_remove_user.setOnActionExpandListener(this);
+        menu_item_search_item = menu.findItem(R.id.menu_search);
+        menu_item_search_item.setOnActionExpandListener(this);
+
+        SearchView searchView = (SearchView) menu_item_search_item.getActionView();
+//        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+//            @Override
+//            public boolean onClose() {
+//
+//                Log.e("test","aaaaaaa");
+//                menu_item_add_user.setVisible(true);
+//                return true;
+//            }
+//        });
+
+
         return true;
     }
 
@@ -74,14 +101,8 @@ public class SetStudentsActivity extends AppCompatActivity {
         recycler_view = findViewById(R.id.recycler_view);
         progress = findViewById(R.id.progress);
         progress.setVisibility(View.GONE);
-
-
-
-
         checkBluetooth();
     }
-
-
 
     private void checkBluetooth() {
         int permission =
@@ -187,4 +208,27 @@ public class SetStudentsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    @Override
+    public boolean onMenuItemActionExpand(MenuItem item) {
+        if(item.getItemId() == R.id.menu_search) {
+            menu_item_add_user.setVisible(false);
+            menu_item_remove_user.setVisible(false);
+        }else if(item.getItemId() == R.id.menu_remove_user) {
+            menu_item_add_user.setVisible(false);
+            menu_item_search_item.setVisible(false);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemActionCollapse(MenuItem item) {
+        if(item.getItemId() == R.id.menu_search) {
+            menu_item_add_user.setVisible(true);
+            menu_item_remove_user.setVisible(true);
+        }else if(item.getItemId() == R.id.menu_remove_user) {
+            menu_item_add_user.setVisible(true);
+            menu_item_search_item.setVisible(true);
+        }
+        return true;
+    }
 }
