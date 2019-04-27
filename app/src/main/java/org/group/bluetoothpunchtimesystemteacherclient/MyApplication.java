@@ -4,6 +4,10 @@ import android.app.Application;
 import android.content.Intent;
 
 import org.group.bluetoothpunchtimesystemteacherclient.activities.ExitActivity;
+import org.group.bluetoothpunchtimesystemteacherclient.objects.StudentInformationObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MyApplication extends Application {
 
@@ -35,4 +39,15 @@ public class MyApplication extends Application {
         }
     }
 
+    private List<StudentInformationObject> list;
+
+    /**
+     * Get Data From Single Instance
+     * @return
+     */
+    public List<StudentInformationObject> getStudentInformations() {
+        if(list == null)
+            list = new ArrayList<>();
+        return list;
+    }
 }

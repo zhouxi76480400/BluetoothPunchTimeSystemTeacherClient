@@ -15,6 +15,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -30,6 +31,10 @@ import android.widget.ProgressBar;
 
 import org.group.bluetoothpunchtimesystemteacherclient.MyApplication;
 import org.group.bluetoothpunchtimesystemteacherclient.R;
+import org.group.bluetoothpunchtimesystemteacherclient.activities.adapters.StudentAdapter;
+import org.group.bluetoothpunchtimesystemteacherclient.objects.StudentInformationObject;
+
+import java.util.List;
 
 public class SetStudentsActivity extends AppCompatActivity implements
         MenuItem.OnActionExpandListener, ActionMode.Callback, SearchView.OnQueryTextListener {
@@ -39,6 +44,8 @@ public class SetStudentsActivity extends AppCompatActivity implements
     private SwipeRefreshLayout refresh_layout;
 
     private RecyclerView recycler_view;
+
+    private StudentAdapter adapter;
 
     private ProgressBar progress;
 
@@ -153,6 +160,9 @@ public class SetStudentsActivity extends AppCompatActivity implements
         refresh_layout = findViewById(R.id.refresh_layout);
         refresh_layout.setColorSchemeColors(getColor(R.color.colorAccent));
         recycler_view = findViewById(R.id.recycler_view);
+        recycler_view.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new StudentAdapter(this,recycler_view);
+        recycler_view.setAdapter(adapter);
         progress = findViewById(R.id.progress);
         progress.setVisibility(View.GONE);
         checkBluetooth();
