@@ -2,10 +2,12 @@ package org.group.bluetoothpunchtimesystemteacherclient.activities.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import org.group.bluetoothpunchtimesystemteacherclient.MyApplication;
 import org.group.bluetoothpunchtimesystemteacherclient.R;
@@ -53,8 +55,17 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
 
     class StudentViewHolder extends RecyclerView.ViewHolder {
 
+        public LinearLayout ll_main;
+
+        public CardView card_view;
+
         public StudentViewHolder(@NonNull View itemView) {
             super(itemView);
+            ll_main = itemView.findViewById(R.id.ll_main);
+            card_view = itemView.findViewById(R.id.card_view);
+
+
+
         }
 
     }

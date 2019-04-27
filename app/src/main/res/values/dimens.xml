@@ -9,5 +9,6 @@
     <dimen name="default_text_view_margin">8dp</dimen>
     <dimen name="default_text_size_content">16sp</dimen>
     <dimen name="main_activity_text_size_big">26sp</dimen>
+    <dimen name="student_list_card_view_height">84dp</dimen>
 
 </resources>
