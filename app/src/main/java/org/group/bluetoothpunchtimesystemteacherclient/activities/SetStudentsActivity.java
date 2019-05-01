@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.PermissionChecker;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -27,19 +28,30 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
 import org.group.bluetoothpunchtimesystemteacherclient.MyApplication;
 import org.group.bluetoothpunchtimesystemteacherclient.R;
 import org.group.bluetoothpunchtimesystemteacherclient.activities.adapters.StudentAdapter;
+import org.group.bluetoothpunchtimesystemteacherclient.network.GetAllUsersThread;
+import org.group.bluetoothpunchtimesystemteacherclient.network.NetworkThread;
 import org.group.bluetoothpunchtimesystemteacherclient.objects.StudentInformationObject;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.List;
 
+import okhttp3.Response;
+
 public class SetStudentsActivity extends AppCompatActivity implements
-        MenuItem.OnActionExpandListener, ActionMode.Callback, SearchView.OnQueryTextListener {
+        MenuItem.OnActionExpandListener, ActionMode.Callback, SearchView.OnQueryTextListener,
+        NetworkThread.OnNetworkThreadReturnListener, SwipeRefreshLayout.OnRefreshListener,
+        View.OnClickListener {
 
     public static final int TURN_ON_BLUETOOTH_REQUEST_CODE = 0x000001;
+
+    private FrameLayout fl_main;
 
     private SwipeRefreshLayout refresh_layout;
 
@@ -50,6 +62,10 @@ public class SetStudentsActivity extends AppCompatActivity implements
     private ProgressBar progress;
 
     private ActionMode actionMode;
+
+    private boolean isRequestServerNow;
+
+    private Snackbar snackbarNoNetwork;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -157,14 +173,34 @@ public class SetStudentsActivity extends AppCompatActivity implements
                 SetStudentsActivity.this.finish();
             }
         });
+        fl_main = findViewById(R.id.fl_main);
         refresh_layout = findViewById(R.id.refresh_layout);
         refresh_layout.setColorSchemeColors(getColor(R.color.colorAccent));
+        refresh_layout.setOnRefreshListener(this);
         recycler_view = findViewById(R.id.recycler_view);
         recycler_view.setLayoutManager(new LinearLayoutManager(this));
         adapter = new StudentAdapter(this,recycler_view);
         recycler_view.setAdapter(adapter);
         progress = findViewById(R.id.progress);
         progress.setVisibility(View.GONE);
+        snackbarNoNetwork = Snackbar.make(fl_main, getString(R.string.no_network_hint),
+                Snackbar.LENGTH_INDEFINITE);
+        snackbarNoNetwork.setAction(getString(R.string.retry),
+                new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v) {
+                        if(!MyApplication.getInstance().isNetworkOn()) {
+                            fl_main.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    snackbarNoNetwork.show();
+                                }
+                            },300);
+                            return;
+                        }
+                        readAllUsersDataFromServer();
+                    }
+                });
         checkBluetooth();
     }
 
@@ -313,14 +349,76 @@ public class SetStudentsActivity extends AppCompatActivity implements
      * need request network to download all student data
      */
     private void readAllUsersDataFromServer() {
-
-
+        if(!isRequestServerNow) {
+            if(!MyApplication.getInstance().isNetworkOn()) {
+                if(refresh_layout.isRefreshing()) {
+                    refresh_layout.setRefreshing(false);
+                }
+                if(!snackbarNoNetwork.isShown()) {
+                    snackbarNoNetwork.show();
+                }
+                return;
+            }
+            if(!refresh_layout.isRefreshing())
+                refresh_layout.setRefreshing(true);
+            GetAllUsersThread thread = new GetAllUsersThread(0,this);
+            thread.start();
+            isRequestServerNow = true;
+        }
     }
 
     /**
      * must push to server
      */
     private void removeUsersFromServer() {
+
+    }
+
+    @Override
+    public void onNetworkThreadGetDataSuccessful(Response data) {
+        changeNetworkFlag();
+        int code = data.code();
+        if(code == HttpURLConnection.HTTP_OK) {
+
+
+
+
+        }else {
+            onNetworkThreadGetDataFailed(code);
+        }
+    }
+
+    @Override
+    public void onNetworkThreadGetDataFailed(int statusCode) {
+        changeNetworkFlag();
+        if(statusCode == NetworkThread.STATUS_CODE_NO_NETWORK) {
+            if(!snackbarNoNetwork.isShown())
+                snackbarNoNetwork.show();
+        }
+    }
+
+    private void changeNetworkFlag() {
+        if(isRequestServerNow) {
+            if(refresh_layout.isRefreshing()) {
+                refresh_layout.setRefreshing(false);
+            }
+            if(snackbarNoNetwork != null) {
+                if(MyApplication.getInstance().isNetworkOn()) {
+                    if(snackbarNoNetwork.isShown())
+                        snackbarNoNetwork.dismiss();
+                }
+            }
+            isRequestServerNow = false;
+        }
+    }
+
+    @Override
+    public void onRefresh() {
+        readAllUsersDataFromServer();
+    }
+
+    @Override
+    public void onClick(View v) {
 
     }
 }

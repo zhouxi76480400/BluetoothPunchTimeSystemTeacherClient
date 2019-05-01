@@ -1,7 +1,11 @@
 package org.group.bluetoothpunchtimesystemteacherclient;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.telecom.ConnectionService;
 
 import org.group.bluetoothpunchtimesystemteacherclient.activities.ExitActivity;
 import org.group.bluetoothpunchtimesystemteacherclient.objects.StudentInformationObject;
@@ -49,5 +53,14 @@ public class MyApplication extends Application {
         if(list == null)
             list = new ArrayList<>();
         return list;
+    }
+
+    public boolean isNetworkOn() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        Network network = connectivityManager.getActiveNetwork();
+        if(network == null)
+            return false;
+        return true;
     }
 }

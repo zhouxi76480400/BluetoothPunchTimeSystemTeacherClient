@@ -1,9 +1,11 @@
 package org.group.bluetoothpunchtimesystemteacherclient.activities;
 
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
@@ -14,6 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -21,13 +24,20 @@ import android.widget.ScrollView;
 
 import com.google.gson.Gson;
 
+import org.group.bluetoothpunchtimesystemteacherclient.MyApplication;
 import org.group.bluetoothpunchtimesystemteacherclient.R;
+import org.group.bluetoothpunchtimesystemteacherclient.network.AddUsersThread;
+import org.group.bluetoothpunchtimesystemteacherclient.network.NetworkThread;
 import org.group.bluetoothpunchtimesystemteacherclient.objects.StudentInformationObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddAStudentActivity extends AppCompatActivity implements View.OnClickListener {
+import okhttp3.Response;
+
+public class AddAStudentActivity extends AppCompatActivity implements View.OnClickListener,
+        NetworkThread.OnNetworkThreadReturnListener {
 
     /**
      * check this flag, if this value is true, should submit to update API.
@@ -50,6 +60,12 @@ public class AddAStudentActivity extends AppCompatActivity implements View.OnCli
 
     private ScrollView scroll_view;
 
+    private boolean isRequestNow;
+
+    private String waitingUpdateJSON;
+
+    private Snackbar snackbarNoNetwork;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,7 +84,9 @@ public class AddAStudentActivity extends AppCompatActivity implements View.OnCli
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_ok:
-                checkInput();
+                if(!isRequestNow) {
+                    checkInput();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -87,7 +105,7 @@ public class AddAStudentActivity extends AppCompatActivity implements View.OnCli
             toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    finish();
+                    onBackPressed();
                 }
             });
         }
@@ -116,6 +134,27 @@ public class AddAStudentActivity extends AppCompatActivity implements View.OnCli
         til_student_number = findViewById(R.id.til_student_number);
         til_last_name = findViewById(R.id.til_last_name);
         til_first_name = findViewById(R.id.til_first_name);
+        snackbarNoNetwork =
+                Snackbar.make(ll_main,getString(R.string.no_network_hint),
+                        Snackbar.LENGTH_INDEFINITE);
+        snackbarNoNetwork.setAction(getString(R.string.retry),new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                if(!MyApplication.getInstance().isNetworkOn()) {
+                    ll_main.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(!snackbarNoNetwork.isShown()) {
+                                snackbarNoNetwork.show();
+                            }
+                        }
+                    },300);
+                    return;
+                }
+                checkInput();
+            }
+        });
+
     }
 
     @Override
@@ -163,6 +202,10 @@ public class AddAStudentActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void checkInput() {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.
+                hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
         String mac_address = til_mac_addr.getEditText().getText().toString();
         String student_number = til_student_number.getEditText().getText().toString();
         String last_name = til_last_name.getEditText().getText().toString();
@@ -210,11 +253,63 @@ public class AddAStudentActivity extends AppCompatActivity implements View.OnCli
             studentInformationObject.last_name = last_name;
             studentInformationObject.first_name = first_name;
             Gson gson = new Gson();
-            String json = gson.toJson(studentInformationObject);
-            Log.e("test",json);
-            scroll_view.setVisibility(View.GONE);
-            progress.setVisibility(View.VISIBLE);
+            waitingUpdateJSON = gson.toJson(studentInformationObject);
+            sendNewDataToServer();
 
         }
+    }
+
+    private void sendNewDataToServer() {
+        if(!isRequestNow) {
+            if(!MyApplication.getInstance().isNetworkOn()) {
+                if(!snackbarNoNetwork.isShown()) {
+                    snackbarNoNetwork.show();
+                }
+                return;
+            }
+            if(snackbarNoNetwork.isShown()) {
+                snackbarNoNetwork.dismiss();
+            }
+            progress.setVisibility(View.VISIBLE);
+            scroll_view.setVisibility(View.GONE);
+            AddUsersThread addUsersThread = new AddUsersThread(is_edit,waitingUpdateJSON);
+            addUsersThread.setOnNetworkThreadReturnListener(this);
+            isRequestNow = true;
+            addUsersThread.start();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(isRequestNow) {
+            Snackbar.make(ll_main,getString(R.string.waiting_for_update_hint),
+                    BaseTransientBottomBar.LENGTH_SHORT).show();
+        }else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void onNetworkThreadGetDataSuccessful(Response response) {
+        String data = null;
+        try {
+            data = response.body().string();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if(data != null) {
+
+            Log.e("tset",data);
+
+
+
+        }else {
+            onNetworkThreadGetDataFailed(NetworkThread.STATUS_CODE_REMOTE_SERVER_PROBLEM);
+        }
+    }
+
+    @Override
+    public void onNetworkThreadGetDataFailed(int statusCode) {
+
     }
 }
