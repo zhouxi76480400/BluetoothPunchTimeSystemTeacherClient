@@ -33,7 +33,7 @@ public class APIClass {
     public static Response getAllUsers(long lastNumber) {
         OkHttpClient okHttpClient = new OkHttpClient();
         FormBody formBody = new FormBody.Builder()
-                .add("last",String.valueOf(lastNumber))
+                .add("l",String.valueOf(lastNumber))
                 .build();
         Request request = new Request.Builder()
                 .url(ServerAndApiList.getFullAPIAddress(ServerAndApiList.API_GET_ALL_USER))

@@ -35,5 +35,11 @@
     <string name="select_users_to_remove">Select User(s) To Remove</string>
     <string name="no_network_hint">No network, please check your network connection.</string>
     <string name="waiting_for_update_hint">Please waiting for data update until success.</string>
+    <string name="add_a_user_success_hint">Add new student successful!</string>
+    <string name="edit_a_user_success_hint">Edit student information successful!</string>
+    <string name="mac_address_exists">The MAC address is exist.</string>
+    <string name="student_number_exists">The student number is exist.</string>
+    <string name="unknown_error">Unknown server error.</string>
+
 
 </resources>

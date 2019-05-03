@@ -50,6 +50,8 @@ public class GetAllUsersThread extends NetworkThread {
     public void run() {
         super.run();
         Response response = APIClass.getAllUsers(lastNumber);
+
+
         if(listener != null) {
             if(response != null) {
                 Log.e("aaaa","bbbbbb");
