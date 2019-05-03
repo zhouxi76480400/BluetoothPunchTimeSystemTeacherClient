@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.PermissionChecker;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -27,19 +28,35 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+
+import com.google.gson.Gson;
 
 import org.group.bluetoothpunchtimesystemteacherclient.MyApplication;
 import org.group.bluetoothpunchtimesystemteacherclient.R;
 import org.group.bluetoothpunchtimesystemteacherclient.activities.adapters.StudentAdapter;
+import org.group.bluetoothpunchtimesystemteacherclient.network.GetAllUsersThread;
+import org.group.bluetoothpunchtimesystemteacherclient.network.NetworkThread;
+import org.group.bluetoothpunchtimesystemteacherclient.network.StatusCodeList;
+import org.group.bluetoothpunchtimesystemteacherclient.objects.GetUserReturnPOJO;
 import org.group.bluetoothpunchtimesystemteacherclient.objects.StudentInformationObject;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.Response;
+
 public class SetStudentsActivity extends AppCompatActivity implements
-        MenuItem.OnActionExpandListener, ActionMode.Callback, SearchView.OnQueryTextListener {
+        MenuItem.OnActionExpandListener, ActionMode.Callback, SearchView.OnQueryTextListener,
+        NetworkThread.OnNetworkThreadReturnListener, SwipeRefreshLayout.OnRefreshListener,
+        View.OnClickListener {
 
     public static final int TURN_ON_BLUETOOTH_REQUEST_CODE = 0x000001;
+
+    private FrameLayout fl_main;
 
     private SwipeRefreshLayout refresh_layout;
 
@@ -47,14 +64,27 @@ public class SetStudentsActivity extends AppCompatActivity implements
 
     private StudentAdapter adapter;
 
-    private ProgressBar progress;
-
     private ActionMode actionMode;
+
+    private boolean isRequestServerNow;
+
+    private boolean isFromFirstPage;
+
+    private List<StudentInformationObject> dataSource;
+
+    private Snackbar snackbarNoNetwork;
+
+    private boolean isLastPageNow;
+
+    private int lastRequestAddDataSize;
+
+    private boolean isShowActionModeNow;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_students);
+        dataSource = new ArrayList<>();
         initView();
     }
 
@@ -100,6 +130,11 @@ public class SetStudentsActivity extends AppCompatActivity implements
     private void showActionMode() {
         if(actionMode == null) {
             actionMode = startSupportActionMode(this);
+            isShowActionModeNow = true;
+            if(refresh_layout.isEnabled()) {
+                refresh_layout.setEnabled(false);
+            }
+            showAndHideCheckbox(true);
         }
 
     }
@@ -121,13 +156,23 @@ public class SetStudentsActivity extends AppCompatActivity implements
         if(menuItem.getItemId() == R.id.menu_remove_users_ok) {
             actionMode.finish();
             removeUsersFromServer();
+            onActionItemHideChangeUI();
         }
         return true;
+    }
+
+    private void onActionItemHideChangeUI() {
+        isShowActionModeNow = false;
+        if(!refresh_layout.isEnabled()) {
+            refresh_layout.setEnabled(true);
+        }
+        showAndHideCheckbox(false);
     }
 
     @Override
     public void onDestroyActionMode(ActionMode actionMode) {
         this.actionMode = null;
+        onActionItemHideChangeUI();
     }
 
     @Override
@@ -137,7 +182,9 @@ public class SetStudentsActivity extends AppCompatActivity implements
                 gotoAddAStudentActivity();
                 return true;
             case R.id.menu_remove_user:
-                showActionMode();
+                if(!isRequestServerNow) {
+                    showActionMode();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -157,14 +204,32 @@ public class SetStudentsActivity extends AppCompatActivity implements
                 SetStudentsActivity.this.finish();
             }
         });
+        fl_main = findViewById(R.id.fl_main);
         refresh_layout = findViewById(R.id.refresh_layout);
         refresh_layout.setColorSchemeColors(getColor(R.color.colorAccent));
+        refresh_layout.setOnRefreshListener(this);
         recycler_view = findViewById(R.id.recycler_view);
         recycler_view.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new StudentAdapter(this,recycler_view);
+        adapter = new StudentAdapter(this,recycler_view,dataSource);
         recycler_view.setAdapter(adapter);
-        progress = findViewById(R.id.progress);
-        progress.setVisibility(View.GONE);
+        snackbarNoNetwork = Snackbar.make(fl_main, getString(R.string.no_network_hint),
+                Snackbar.LENGTH_INDEFINITE);
+        snackbarNoNetwork.setAction(getString(R.string.retry),
+                new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v) {
+                        if(!MyApplication.getInstance().isNetworkOn()) {
+                            fl_main.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    snackbarNoNetwork.show();
+                                }
+                            },300);
+                            return;
+                        }
+                        readAllUsersDataFromServer(getLastId());
+                    }
+                });
         checkBluetooth();
     }
 
@@ -229,7 +294,7 @@ public class SetStudentsActivity extends AppCompatActivity implements
                             .create();
                     alertDialog.show();
                 }else {
-                    readAllUsersDataFromServer();
+                    readAllUsersDataFromServer(0);
                 }
             }
         }
@@ -252,16 +317,21 @@ public class SetStudentsActivity extends AppCompatActivity implements
             // catch the turn on bt req
             if(resultCode == RESULT_OK) {
                 // go to next phase
-                readAllUsersDataFromServer();
+//                readAllUsersDataFromServer();
+                Log.e("test","go back");
             } else {
                 checkBluetooth();
+            }
+        }else if(requestCode == AddAStudentActivity.REQUEST_CODE_ADD_A_STUDENT) {
+            if(resultCode == RESULT_OK) {
+
             }
         }
     }
 
     private void gotoAddAStudentActivity() {
         Intent intent = new Intent(this,AddAStudentActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent,AddAStudentActivity.REQUEST_CODE_ADD_A_STUDENT);
     }
 
     @Override
@@ -312,9 +382,55 @@ public class SetStudentsActivity extends AppCompatActivity implements
     /**
      * need request network to download all student data
      */
-    private void readAllUsersDataFromServer() {
+    private void readAllUsersDataFromServer(int last_number) {
+        if(!isRequestServerNow && !isShowActionModeNow) {
+            if(!MyApplication.getInstance().isNetworkOn()) {
+                if(refresh_layout.isRefreshing()) {
+                    refresh_layout.setRefreshing(false);
+                }
+                if(!snackbarNoNetwork.isShown()) {
+                    snackbarNoNetwork.show();
+                }
+                return;
+            }
+            boolean isFromFirst = false;
+            if(last_number == 0) {
+                isFromFirst = true;
+                dataSource.clear();
+            }
+            isFromFirstPage = isFromFirst;
+            changeUI(isFromFirstPage,true);
+            GetAllUsersThread thread = new GetAllUsersThread(0,this);
+            thread.start();
+        }
+    }
 
+    private void changeUI(boolean isFromFirstPage,boolean isRequestServerNow) {
+        if(isRequestServerNow) {
+            if(isFromFirstPage) {
+                if(!refresh_layout.isRefreshing())
+                    refresh_layout.setRefreshing(true);
+            }else {
 
+            }
+        }else {
+            if(isFromFirstPage) {
+                if(refresh_layout.isRefreshing())
+                    refresh_layout.setRefreshing(false);
+            }else {
+
+            }
+        }
+        this.isFromFirstPage = isFromFirstPage;
+        this.isRequestServerNow = isRequestServerNow;
+
+        if(isFromFirstPage) {
+            Log.e("test","isFromFirstPage");
+            adapter.notifyDataSetChanged();
+        }else {
+//            lastRequestAddDataSize
+
+        }
     }
 
     /**
@@ -322,5 +438,101 @@ public class SetStudentsActivity extends AppCompatActivity implements
      */
     private void removeUsersFromServer() {
 
+    }
+
+    @Override
+    public void onNetworkThreadGetDataSuccessful(Response data) {
+        int code = data.code();
+        if(code == HttpURLConnection.HTTP_OK) {
+            String json = null;
+            try {
+                json = data.body().string();
+            } catch (IOException e) {
+                onNetworkThreadGetDataFailed(StatusCodeList.STATUS_CODE_JSON_PARAMETER_NOT_EQUALS);
+                e.printStackTrace();
+            }
+            decodeJSON(json);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    changeNetworkFlag();
+                }
+            });
+        }else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    onNetworkThreadGetDataFailed(code);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onNetworkThreadGetDataFailed(int statusCode) {
+        changeNetworkFlag();
+        if(statusCode == NetworkThread.STATUS_CODE_NO_NETWORK) {
+            if(!snackbarNoNetwork.isShown())
+                snackbarNoNetwork.show();
+        }
+    }
+
+    private void changeNetworkFlag() {
+        if(isRequestServerNow) {
+            if(refresh_layout.isRefreshing()) {
+                refresh_layout.setRefreshing(false);
+            }
+            if(snackbarNoNetwork != null) {
+                if(MyApplication.getInstance().isNetworkOn()) {
+                    if(snackbarNoNetwork.isShown())
+                        snackbarNoNetwork.dismiss();
+                }
+            }
+            changeUI(isFromFirstPage,!isRequestServerNow);
+        }
+    }
+
+    @Override
+    public void onRefresh() {
+        readAllUsersDataFromServer(0);
+    }
+
+    @Override
+    public void onClick(View v) {
+
+    }
+
+    private boolean isRequestFromFirstPage() {
+        if(dataSource.size() > 0)
+            return false;
+        else
+            return true;
+    }
+
+    private int getLastId() {
+        if(dataSource.size() > 0) {
+            StudentInformationObject studentInformationObject
+                    = dataSource.get(dataSource.size() - 1);
+            return (int) studentInformationObject.id;
+        }
+        return 0;
+    }
+
+    private void decodeJSON(String data) {
+        if(isFromFirstPage) {
+            Log.e("test","isFromFirstPage");
+            dataSource.clear();
+        }
+        Gson gson = new Gson();
+        GetUserReturnPOJO getUserReturnPOJO = gson.fromJson(data, GetUserReturnPOJO.class);
+        isLastPageNow = getUserReturnPOJO.end_page;
+        lastRequestAddDataSize = getUserReturnPOJO.data.size();
+        dataSource.addAll(getUserReturnPOJO.data);
+        Log.e("test",data);
+    }
+
+    private void showAndHideCheckbox(boolean isShowCheckbox) {
+        adapter.isShowCheckbox = isShowCheckbox;
+        adapter.notifyDataSetChanged();
     }
 }
