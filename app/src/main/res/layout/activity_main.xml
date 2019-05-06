@@ -27,7 +27,7 @@
                 android:orientation="horizontal"
                 android:id="@+id/ll_cv_set_students"
                 android:background="?attr/selectableItemBackground"
-                android:gravity="center"
+                android:gravity="center_vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -39,11 +39,12 @@
                 <TextView
                     android:text="@string/student_management"
                     android:textStyle="bold"
+                    android:gravity="center"
                     android:textColor="@color/colorPrimary"
                     android:layout_margin="@dimen/default_margin"
                     android:singleLine="true"
                     android:textSize="@dimen/main_activity_text_size_big"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
             </LinearLayout>
@@ -64,9 +65,25 @@
                 android:orientation="horizontal"
                 android:id="@+id/ll_start_new_session"
                 android:background="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+                <ImageView
+                    android:src="@drawable/ic_power_settings_new"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp" />
+
+                <TextView
+                    android:text="@string/start_new_session"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:textColor="@color/colorPrimary"
+                    android:layout_margin="@dimen/default_margin"
+                    android:singleLine="true"
+                    android:textSize="@dimen/main_activity_text_size_big"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
             </LinearLayout>
 
@@ -84,10 +101,26 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:id="@+id/ll_show_all_session"
+                android:gravity="center_vertical"
                 android:background="?attr/selectableItemBackground"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+                <ImageView
+                    android:src="@drawable/ic_assignment"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp" />
+
+                <TextView
+                    android:text="@string/all_records"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:textColor="@color/colorPrimary"
+                    android:layout_margin="@dimen/default_margin"
+                    android:singleLine="true"
+                    android:textSize="@dimen/main_activity_text_size_big"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
             </LinearLayout>
 

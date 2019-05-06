@@ -470,6 +470,15 @@ public class SetStudentsActivity extends AppCompatActivity implements
 
     @Override
     public void onNetworkThreadGetDataFailed(int statusCode) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                onNetworkThreadGetDataFailedMainThread(statusCode);
+            }
+        });
+    }
+
+    private void onNetworkThreadGetDataFailedMainThread(int statusCode) {
         changeNetworkFlag();
         if(statusCode == NetworkThread.STATUS_CODE_NO_NETWORK) {
             if(!snackbarNoNetwork.isShown())
