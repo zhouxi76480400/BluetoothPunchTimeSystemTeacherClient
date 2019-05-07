@@ -28,14 +28,17 @@ public class GetAllUsersThread extends NetworkThread {
     public GetAllUsersThread(int lastNumber) {
         super();
         if(lastNumber <0) {
-            lastNumber = 0;
+            this.lastNumber = 0;
         }
     }
 
     public GetAllUsersThread(int lastNumber, OnNetworkThreadReturnListener newListener) {
         super();
-        if(lastNumber <0) {
-            lastNumber = 0;
+        Log.e("test","lastNumber:"+lastNumber);
+        if(lastNumber < 0) {
+            this.lastNumber = 0;
+        }else {
+            this.lastNumber = lastNumber;
         }
         this.listener = newListener;
     }
@@ -50,11 +53,8 @@ public class GetAllUsersThread extends NetworkThread {
     public void run() {
         super.run();
         Response response = APIClass.getAllUsers(lastNumber);
-
-
         if(listener != null) {
             if(response != null) {
-                Log.e("aaaa","bbbbbb");
                 listener.onNetworkThreadGetDataSuccessful(response);
             }else {
                 int code = STATUS_CODE_NO_NETWORK;

@@ -52,7 +52,7 @@ import okhttp3.Response;
 public class SetStudentsActivity extends AppCompatActivity implements
         MenuItem.OnActionExpandListener, ActionMode.Callback, SearchView.OnQueryTextListener,
         NetworkThread.OnNetworkThreadReturnListener, SwipeRefreshLayout.OnRefreshListener,
-        View.OnClickListener {
+        View.OnClickListener, StudentAdapter.StudentAdapterListener {
 
     public static final int TURN_ON_BLUETOOTH_REQUEST_CODE = 0x000001;
 
@@ -211,6 +211,7 @@ public class SetStudentsActivity extends AppCompatActivity implements
         recycler_view = findViewById(R.id.recycler_view);
         recycler_view.setLayoutManager(new LinearLayoutManager(this));
         adapter = new StudentAdapter(this,recycler_view,dataSource);
+        adapter.setStudentAdapterListener(this);
         recycler_view.setAdapter(adapter);
         snackbarNoNetwork = Snackbar.make(fl_main, getString(R.string.no_network_hint),
                 Snackbar.LENGTH_INDEFINITE);
@@ -399,8 +400,9 @@ public class SetStudentsActivity extends AppCompatActivity implements
                 dataSource.clear();
             }
             isFromFirstPage = isFromFirst;
-            changeUI(isFromFirstPage,true);
-            GetAllUsersThread thread = new GetAllUsersThread(0,this);
+//            changeUI(isFromFirstPage,true);
+            isRequestServerNow = true;
+            GetAllUsersThread thread = new GetAllUsersThread(last_number,this);
             thread.start();
         }
     }
@@ -425,10 +427,16 @@ public class SetStudentsActivity extends AppCompatActivity implements
         this.isRequestServerNow = isRequestServerNow;
 
         if(isFromFirstPage) {
-            Log.e("test","isFromFirstPage");
+//            Log.e("test","isFromFirstPage");
             adapter.notifyDataSetChanged();
         }else {
-//            lastRequestAddDataSize
+//            Log.e("test","isRequestServerNow:"+isRequestServerNow);
+            int last = dataSource.size() - lastRequestAddDataSize;
+//            Log.e("test:","dataSource.size():"+dataSource.size()+",lastRequestAddDataSize"+lastRequestAddDataSize);
+            adapter.notifyItemRangeInserted(last,lastRequestAddDataSize);
+            adapter.notifyItemChanged(dataSource.size());
+
+//            Log.e("etst","aaaaaaaaaaaa11111:"+adapter.getItemCount());
 
         }
     }
@@ -543,5 +551,16 @@ public class SetStudentsActivity extends AppCompatActivity implements
     private void showAndHideCheckbox(boolean isShowCheckbox) {
         adapter.isShowCheckbox = isShowCheckbox;
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onLoad() {
+        if(!isRequestServerNow) {
+            Log.e("test","aaaaaaa");
+            int id = (int) dataSource.get(dataSource.size() - 1).id;
+            Log.e("test","aaaa:"+id);
+
+            readAllUsersDataFromServer(id);
+        }
     }
 }

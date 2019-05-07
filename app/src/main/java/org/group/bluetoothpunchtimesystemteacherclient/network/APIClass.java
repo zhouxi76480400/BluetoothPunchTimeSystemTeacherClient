@@ -32,12 +32,13 @@ public class APIClass {
      */
     public static Response getAllUsers(long lastNumber) {
         OkHttpClient okHttpClient = new OkHttpClient();
-        FormBody formBody = new FormBody.Builder()
-                .add("l",String.valueOf(lastNumber))
-                .build();
+        Map<String,String> kv = new HashMap<>();
+        kv.put("l",String.valueOf(lastNumber));
+        Log.e("test","l:"+lastNumber);
+        RequestBody requestBody = getRequestBody(kv);
         Request request = new Request.Builder()
                 .url(ServerAndApiList.getFullAPIAddress(ServerAndApiList.API_GET_ALL_USER))
-                .post(formBody)
+                .post(requestBody)
                 .build();
         Call call = okHttpClient.newCall(request);
         try {
