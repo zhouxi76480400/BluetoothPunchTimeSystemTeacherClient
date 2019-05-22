@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.PermissionChecker;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -46,6 +45,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.Response;
 
@@ -445,7 +445,13 @@ public class SetStudentsActivity extends AppCompatActivity implements
      * must push to server
      */
     private void removeUsersFromServer() {
+        Map<Integer,Boolean> map = adapter.getSelectedMap();
+        Log.e("test",map.toString());
 
+
+
+
+        adapter.cleanMap();
     }
 
     @Override

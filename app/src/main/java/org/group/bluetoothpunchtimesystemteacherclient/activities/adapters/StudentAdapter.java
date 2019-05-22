@@ -10,13 +10,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.group.bluetoothpunchtimesystemteacherclient.R;
 import org.group.bluetoothpunchtimesystemteacherclient.objects.StudentInformationObject;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class StudentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -43,6 +47,16 @@ public class StudentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private RecyclerView recyclerView;
 
     private List<StudentInformationObject> dataSource;
+
+    private Map<Integer,Boolean> selectedMap;
+
+    public void cleanMap() {
+        selectedMap.clear();
+    }
+
+    public Map<Integer, Boolean> getSelectedMap() {
+        return selectedMap;
+    }
 
     public StudentAdapter(Context ctx, RecyclerView recyclerView,
                           List<StudentInformationObject> data) {
@@ -85,6 +99,7 @@ public class StudentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 }
             }
         });
+        selectedMap = new HashMap<>();
     }
 
     @NonNull
@@ -158,7 +173,8 @@ public class StudentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return returnCount;
     }
 
-    class StudentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class StudentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
+            CheckBox.OnCheckedChangeListener {
 
         public AppCompatCheckBox checkBox;
 
@@ -173,6 +189,7 @@ public class StudentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         public StudentViewHolder(@NonNull View itemView) {
             super(itemView);
             checkBox = itemView.findViewById(R.id.checkbox);
+            checkBox.setOnCheckedChangeListener(this);
             tv_title = itemView.findViewById(R.id.tv_title);
             tv_sn = itemView.findViewById(R.id.tv_sn);
             tv_mac = itemView.findViewById(R.id.tv_mac);
@@ -182,7 +199,15 @@ public class StudentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         @Override
         public void onClick(View v) {
+            if(isShowCheckbox) {
+                checkBox.setChecked(!checkBox.isChecked());
+            }
+        }
 
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            int position = getLayoutPosition();
+            selectedMap.put(position,isChecked);
         }
     }
 
