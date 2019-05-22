@@ -43,6 +43,8 @@
     <string name="start_new_session">Start New Session</string>
     <string name="all_records">All Records</string>
     <string name="get_student_progress_hint">Loading now …</string>
+    <string name="no_student">No Student</string>
+    <string name="no_more">No More</string>
 
 
 </resources>

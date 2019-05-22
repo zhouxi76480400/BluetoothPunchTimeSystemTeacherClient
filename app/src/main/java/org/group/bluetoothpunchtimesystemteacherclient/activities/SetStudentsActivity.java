@@ -29,6 +29,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 
@@ -42,6 +43,7 @@ import org.group.bluetoothpunchtimesystemteacherclient.objects.GetUserReturnPOJO
 import org.group.bluetoothpunchtimesystemteacherclient.objects.StudentInformationObject;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +63,8 @@ public class SetStudentsActivity extends AppCompatActivity implements
     private SwipeRefreshLayout refresh_layout;
 
     private RecyclerView recycler_view;
+
+    private TextView tv_no_student;
 
     private StudentAdapter adapter;
 
@@ -210,6 +214,8 @@ public class SetStudentsActivity extends AppCompatActivity implements
         refresh_layout.setOnRefreshListener(this);
         recycler_view = findViewById(R.id.recycler_view);
         recycler_view.setLayoutManager(new LinearLayoutManager(this));
+        tv_no_student = findViewById(R.id.tv_no_student);
+        tv_no_student.setVisibility(View.GONE);
         adapter = new StudentAdapter(this,recycler_view,dataSource);
         adapter.setStudentAdapterListener(this);
         recycler_view.setAdapter(adapter);
@@ -313,7 +319,6 @@ public class SetStudentsActivity extends AppCompatActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == TURN_ON_BLUETOOTH_REQUEST_CODE) {
             // catch the turn on bt req
             if(resultCode == RESULT_OK) {
@@ -325,14 +330,48 @@ public class SetStudentsActivity extends AppCompatActivity implements
             }
         }else if(requestCode == AddAStudentActivity.REQUEST_CODE_ADD_A_STUDENT) {
             if(resultCode == RESULT_OK) {
-
+                Bundle bundle = data.getExtras();
+                if(bundle != null) {
+                    Serializable serializable =
+                            bundle.getSerializable(AddAStudentActivity.INTENT_OBJECT_KEY);
+                    if(serializable != null && serializable instanceof StudentInformationObject) {
+                        StudentInformationObject studentInformationObject =
+                                (StudentInformationObject) serializable;
+                        dataSource.add(0,studentInformationObject);
+                        adapter.notifyItemInserted(0);
+                    }
+                }
             }
+        }else if(requestCode == AddAStudentActivity.REQUEST_CODE_EDIT_A_STUDENT) {
+            if(resultCode == RESULT_OK) {
+                Bundle bundle = data.getExtras();
+                Serializable serializable =
+                        bundle.getSerializable(AddAStudentActivity.INTENT_OBJECT_KEY);
+                if(serializable != null && serializable instanceof StudentInformationObject) {
+                    StudentInformationObject studentInformationObject =
+                            (StudentInformationObject) serializable;
+                    int pos = -1;
+                    for(int i = 0 ; i < dataSource.size() ; i ++) {
+                        StudentInformationObject tmp = dataSource.get(i);
+                        if(studentInformationObject.id == tmp.id) {
+                            pos = i;
+                            break;
+                        }
+                    }
+                    if(pos != -1) {
+                        dataSource.remove(pos);
+                        dataSource.add(pos,studentInformationObject);
+                        adapter.notifyItemChanged(pos);
+                    }
+                }
+            }
+        }else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
     private void gotoAddAStudentActivity() {
-        Intent intent = new Intent(this,AddAStudentActivity.class);
-        startActivityForResult(intent,AddAStudentActivity.REQUEST_CODE_ADD_A_STUDENT);
+        AddAStudentActivity.gotoAddAStudentActivityForNewStudent(this);
     }
 
     @Override
@@ -430,14 +469,21 @@ public class SetStudentsActivity extends AppCompatActivity implements
 //            Log.e("test","isFromFirstPage");
             adapter.notifyDataSetChanged();
         }else {
-//            Log.e("test","isRequestServerNow:"+isRequestServerNow);
             int last = dataSource.size() - lastRequestAddDataSize;
-//            Log.e("test:","dataSource.size():"+dataSource.size()+",lastRequestAddDataSize"+lastRequestAddDataSize);
             adapter.notifyItemRangeInserted(last,lastRequestAddDataSize);
             adapter.notifyItemChanged(dataSource.size());
+        }
 
-//            Log.e("etst","aaaaaaaaaaaa11111:"+adapter.getItemCount());
 
+        Log.e("test",isLastPageNow+"isLastPage");
+        if(dataSource.size() == 0) {
+            if(tv_no_student.getVisibility() != View.VISIBLE) {
+                tv_no_student.setVisibility(View.VISIBLE);
+            }
+        }else {
+            if(tv_no_student.getVisibility() != View.GONE) {
+                tv_no_student.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -568,5 +614,17 @@ public class SetStudentsActivity extends AppCompatActivity implements
 
             readAllUsersDataFromServer(id);
         }
+    }
+
+    @Override
+    public boolean isLastPage() {
+        return isLastPageNow;
+    }
+
+    @Override
+    public void onItemPress(int position) {
+        StudentInformationObject studentInformationObject = dataSource.get(position);
+        AddAStudentActivity.gotoAddAnStudentActivityForExistStudent(
+                this,studentInformationObject);
     }
 }

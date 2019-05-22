@@ -6,10 +6,12 @@
     >
 
     <ProgressBar
+        android:id="@+id/progress"
         android:layout_width="@dimen/progress_bar_width_and_height"
         android:layout_height="@dimen/progress_bar_width_and_height" />
 
     <TextView
+        android:id="@+id/text_view"
         android:layout_marginLeft="@dimen/default_left_and_right_margin"
         android:textSize="@dimen/default_text_size_content"
         android:text="@string/get_student_progress_hint"

@@ -13,10 +13,12 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.group.bluetoothpunchtimesystemteacherclient.R;
 import org.group.bluetoothpunchtimesystemteacherclient.objects.StudentInformationObject;
+import org.w3c.dom.Text;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +29,10 @@ public class StudentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public interface StudentAdapterListener {
 
         void onLoad();
+
+        boolean isLastPage();
+
+        void onItemPress(int position);
 
     }
 
@@ -156,8 +162,23 @@ public class StudentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         studentInformationObject.mac_address));
             }
         }else if (viewHolder instanceof ProgressViewHolder) {
-
-
+            if(listener != null) {
+                ProgressViewHolder progressViewHolder = (ProgressViewHolder) viewHolder;
+                if(listener.isLastPage()) {
+                    progressViewHolder.text_view.setText(
+                            progressViewHolder.text_view.getContext().getString(R.string.no_more));
+                    if(progressViewHolder.progress.getVisibility() != View.GONE) {
+                        progressViewHolder.progress.setVisibility(View.GONE);
+                    }
+                }else {
+                    progressViewHolder.text_view.setText(
+                            progressViewHolder.text_view.getContext().
+                                    getString(R.string.get_student_progress_hint));
+                    if(progressViewHolder.progress.getVisibility() != View.VISIBLE) {
+                        progressViewHolder.progress.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
         }
     }
 
@@ -201,6 +222,10 @@ public class StudentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         public void onClick(View v) {
             if(isShowCheckbox) {
                 checkBox.setChecked(!checkBox.isChecked());
+            }else {
+                if(listener != null) {
+                    listener.onItemPress(getLayoutPosition());
+                }
             }
         }
 
@@ -213,8 +238,14 @@ public class StudentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     class ProgressViewHolder extends RecyclerView.ViewHolder {
 
+        public ProgressBar progress;
+
+        public TextView text_view;
+
         public ProgressViewHolder(@NonNull View itemView) {
             super(itemView);
+            progress = itemView.findViewById(R.id.progress);
+            text_view = itemView.findViewById(R.id.text_view);
         }
     }
 

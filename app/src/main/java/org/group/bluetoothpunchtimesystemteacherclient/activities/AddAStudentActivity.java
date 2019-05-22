@@ -1,5 +1,6 @@
 package org.group.bluetoothpunchtimesystemteacherclient.activities;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
@@ -36,6 +37,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +46,26 @@ import okhttp3.Response;
 public class AddAStudentActivity extends AppCompatActivity implements View.OnClickListener,
         NetworkThread.OnNetworkThreadReturnListener {
 
+    public static void gotoAddAStudentActivityForNewStudent(Activity context) {
+        Intent intent = new Intent(context,AddAStudentActivity.class);
+        context.startActivityForResult(intent,AddAStudentActivity.REQUEST_CODE_ADD_A_STUDENT);
+    }
+
+    public static void gotoAddAnStudentActivityForExistStudent(
+            Activity context, StudentInformationObject studentInformationObject) {
+        Intent intent = new Intent(context,AddAStudentActivity.class);
+        intent.setAction(REQUEST_CODE_EDIT);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(INTENT_OBJECT_KEY, studentInformationObject);
+        intent.putExtras(bundle);
+        context.startActivityForResult(intent,AddAStudentActivity.REQUEST_CODE_EDIT_A_STUDENT);
+    }
+
+    public static String REQUEST_CODE_EDIT = "REQUEST_CODE_EDIT";
+
     public static int REQUEST_CODE_ADD_A_STUDENT = 12;
+
+    public static int REQUEST_CODE_EDIT_A_STUDENT = 14;
 
     public static String INTENT_OBJECT_KEY = "new_user_obj";
 
@@ -82,7 +103,38 @@ public class AddAStudentActivity extends AppCompatActivity implements View.OnCli
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_a_student);
+        getData();
         initView();
+        modifyData();
+    }
+
+    private void modifyData() {
+        if(is_edit) {
+            til_mac_addr.getEditText().setText(waitingUpdateObject.mac_address);
+            til_student_number.getEditText().setText(waitingUpdateObject.student_number);
+            til_first_name.getEditText().setText(waitingUpdateObject.first_name);
+            til_last_name.getEditText().setText(waitingUpdateObject.last_name);
+            til_mac_addr.getEditText().requestFocus();
+            showIME();
+        }
+    }
+
+    private void getData() {
+        Intent intent = getIntent();
+        if(intent != null) {
+            if(intent.getAction() != null && intent.getAction().equals(REQUEST_CODE_EDIT)) {
+                Bundle bundle = intent.getExtras();
+                if(bundle != null) {
+                    Serializable serializable = bundle.getSerializable(INTENT_OBJECT_KEY);
+                    if(serializable != null && serializable instanceof StudentInformationObject) {
+                        StudentInformationObject studentInformationObject =
+                                (StudentInformationObject) serializable;
+                        waitingUpdateObject = studentInformationObject;
+                        is_edit = true;
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -175,7 +227,6 @@ public class AddAStudentActivity extends AppCompatActivity implements View.OnCli
                 openBluetoothScanActivity();
                 break;
 
-
         }
     }
 
@@ -258,7 +309,12 @@ public class AddAStudentActivity extends AppCompatActivity implements View.OnCli
                     stringBuilder.toString());
             Snackbar.make(ll_main,hint_text,Snackbar.LENGTH_SHORT).show();
         }else {
-            StudentInformationObject studentInformationObject = new StudentInformationObject();
+            StudentInformationObject studentInformationObject = null;
+            if(waitingUpdateObject != null) {
+                studentInformationObject = waitingUpdateObject;
+            }else {
+                studentInformationObject = new StudentInformationObject();
+            }
             studentInformationObject.mac_address = mac_address;
             studentInformationObject.student_number = student_number;
             studentInformationObject.last_name = last_name;
@@ -267,7 +323,6 @@ public class AddAStudentActivity extends AppCompatActivity implements View.OnCli
             waitingUpdateJSON = gson.toJson(studentInformationObject);
             waitingUpdateObject = studentInformationObject;
             sendNewDataToServer();
-
         }
     }
 
@@ -314,7 +369,7 @@ public class AddAStudentActivity extends AppCompatActivity implements View.OnCli
         try {
             JSONObject jsonObject = new JSONObject(data);
             status_code = Integer.valueOf(jsonObject.getString("s"));
-            if(status_code == StatusCodeList.STATUS_CODE_OK) {
+            if(status_code == StatusCodeList.STATUS_CODE_OK && !is_edit) {
                 id = Integer.valueOf(jsonObject.getString("id"));
             }
         } catch (JSONException e) {
@@ -326,7 +381,8 @@ public class AddAStudentActivity extends AppCompatActivity implements View.OnCli
             onNetworkThreadGetDataFailed(status_code);
             return;
         }
-        waitingUpdateObject.id = id;
+        if(!is_edit)
+            waitingUpdateObject.id = id;
         Intent intent = new Intent();
         Bundle bundle = new Bundle();
         bundle.putSerializable(INTENT_OBJECT_KEY,waitingUpdateObject);
@@ -375,9 +431,13 @@ public class AddAStudentActivity extends AppCompatActivity implements View.OnCli
         if(needFocus != null) {
             needFocus.requestFocus();
             needFocus.setSelection(needFocus.getText().length());
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+            showIME();
         }
+    }
+
+    private void showIME() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
     private void setIsRequestNow(boolean isRequestNow) {

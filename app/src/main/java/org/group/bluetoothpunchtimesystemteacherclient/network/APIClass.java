@@ -61,6 +61,7 @@ public class APIClass {
         Map<String,String> kv = new HashMap<>();
         kv.put("e",String.valueOf(isEdit));
         kv.put("d",json);
+        Log.e("test",json);
         RequestBody requestBody = getRequestBody(kv);
         Request request = new Request.Builder()
                 .post(requestBody)

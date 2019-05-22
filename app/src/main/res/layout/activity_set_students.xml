@@ -23,6 +23,16 @@
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
+        <TextView
+            android:id="@+id/tv_no_student"
+            android:textStyle="bold"
+            android:textSize="@dimen/main_activity_text_size_big"
+            android:textColor="@color/colorAccent"
+            android:text="@string/no_student"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
     </FrameLayout>
 
 </LinearLayout>
