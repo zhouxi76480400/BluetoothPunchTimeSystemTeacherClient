@@ -21,6 +21,11 @@ public class ServerAndApiList implements Serializable {
     public static final String API_ADD_A_USER = "addusr";
 
     /**
+     * Remove Users
+     */
+    public static final String API_REMOVE_USERS = "removeusrs";
+
+    /**
      * Use This Method To Get Api Address
      * @param apiName
      * @return

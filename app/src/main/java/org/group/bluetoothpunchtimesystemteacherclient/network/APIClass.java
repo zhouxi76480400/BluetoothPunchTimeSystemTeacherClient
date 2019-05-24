@@ -2,6 +2,8 @@ package org.group.bluetoothpunchtimesystemteacherclient.network;
 
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -9,6 +11,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -66,6 +69,27 @@ public class APIClass {
         Request request = new Request.Builder()
                 .post(requestBody)
                 .url(ServerAndApiList.getFullAPIAddress(ServerAndApiList.API_ADD_A_USER))
+                .build();
+        Call call = okHttpClient.newCall(request);
+        try {
+            Response response = call.execute();
+            return response;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Response removeUsers(List<Integer> removeList) {
+        Gson gson = new Gson();
+        String json = gson.toJson(removeList);
+        OkHttpClient okHttpClient = new OkHttpClient();
+        Map<String,String> kv = new HashMap<>();
+        kv.put("l",json);
+        RequestBody requestBody = getRequestBody(kv);
+        Request request = new Request.Builder()
+                .post(requestBody)
+                .url(ServerAndApiList.getFullAPIAddress(ServerAndApiList.API_REMOVE_USERS))
                 .build();
         Call call = okHttpClient.newCall(request);
         try {

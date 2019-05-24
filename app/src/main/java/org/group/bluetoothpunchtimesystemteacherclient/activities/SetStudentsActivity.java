@@ -38,6 +38,7 @@ import org.group.bluetoothpunchtimesystemteacherclient.R;
 import org.group.bluetoothpunchtimesystemteacherclient.activities.adapters.StudentAdapter;
 import org.group.bluetoothpunchtimesystemteacherclient.network.GetAllUsersThread;
 import org.group.bluetoothpunchtimesystemteacherclient.network.NetworkThread;
+import org.group.bluetoothpunchtimesystemteacherclient.network.RemoveUserThread;
 import org.group.bluetoothpunchtimesystemteacherclient.network.StatusCodeList;
 import org.group.bluetoothpunchtimesystemteacherclient.objects.GetUserReturnPOJO;
 import org.group.bluetoothpunchtimesystemteacherclient.objects.StudentInformationObject;
@@ -46,6 +47,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -158,9 +161,9 @@ public class SetStudentsActivity extends AppCompatActivity implements
     @Override
     public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
         if(menuItem.getItemId() == R.id.menu_remove_users_ok) {
-            actionMode.finish();
+//            actionMode.finish();
             removeUsersFromServer();
-            onActionItemHideChangeUI();
+//            onActionItemHideChangeUI();
         }
         return true;
     }
@@ -491,13 +494,26 @@ public class SetStudentsActivity extends AppCompatActivity implements
      * must push to server
      */
     private void removeUsersFromServer() {
-        Map<Integer,Boolean> map = adapter.getSelectedMap();
-        Log.e("test",map.toString());
+        List<Integer> removeList = new ArrayList<>();
+        // copy a new one
+        Map<Integer,Boolean> tmp = adapter.getSelectedMap();
+        Iterator iterator = tmp.keySet().iterator();
+        while (iterator.hasNext()) {
+            Integer integer = (Integer) iterator.next();
+            Boolean aBoolean = tmp.get(integer);
+            if(aBoolean) {
+                removeList.add((int) dataSource.get(integer).id);
+            }
+        }
+        // send to server
+        isRequestServerNow = true;
+        RemoveUserThread removeUserThread = new RemoveUserThread(removeList);
+        removeUserThread.start();
 
 
 
 
-        adapter.cleanMap();
+//        adapter.cleanMap();
     }
 
     @Override
