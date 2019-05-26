@@ -46,7 +46,20 @@
     <string name="no_student">No Student</string>
     <string name="no_more">No More</string>
     <string name="remove_users_hint">Remove User(s) now...</string>
-
+    <string name="select_your_next_step">Select Your Next Step</string>
+    <string name="start_a_new_session">Start A New Session</string>
+    <string name="continue_a_exist_session">Continue A Exist Session</string>
+    <string name="new_session">New Session</string>
+    <string name="is_recording_now_hint">Is Recording now, do you want to exit?</string>
+    <string name="is_recording_now_title">Hint</string>
+    <string name="cancel">Cancel</string>
+    <string name="stop">Stop</string>
+    <string name="set_program">Set Program</string>
+    <string name="set_time">Set Time:</string>
+    <string name="set_check_frequency">Set Frequency:</string>
+    <string name="set_lesson_name">Set Lesson Name:</string>
+    <string name="create">Create</string>
+    <string name="quit">Quit</string>
 
 
 </resources>

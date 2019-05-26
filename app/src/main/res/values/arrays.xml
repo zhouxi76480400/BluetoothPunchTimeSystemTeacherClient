@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="array_time">
+        <item>30 Minutes</item>
+        <item>45 Minutes</item>
+        <item>60 Minutes</item>
+        <item>90 Minutes</item>
+        <item>120 Minutes</item>
+        <item>150 Minutes</item>
+        <item>180 Minutes</item>
+    </string-array>
+
+    <string-array name="array_scan_times">
+        <item>3 times</item>
+        <item>5 times</item>
+        <item>7 times</item>
+        <item>9 times</item>
+    </string-array>
+    
+</resources>

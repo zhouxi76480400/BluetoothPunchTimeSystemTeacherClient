@@ -435,7 +435,7 @@ public class AddAStudentActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    private void showIME() {
+    protected void showIME() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
     }

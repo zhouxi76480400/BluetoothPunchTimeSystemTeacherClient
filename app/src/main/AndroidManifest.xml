@@ -39,6 +39,8 @@
 
         <activity android:name=".activities.BluetoothScanActivity"/>
 
+        <activity android:name=".activities.NewSessionActivity"/>
+
     </application>
 
 </manifest>

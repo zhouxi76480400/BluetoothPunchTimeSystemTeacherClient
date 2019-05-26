@@ -56,12 +56,10 @@ import java.util.Map;
 
 import okhttp3.Response;
 
-public class SetStudentsActivity extends AppCompatActivity implements
+public class SetStudentsActivity extends MyActivity implements
         MenuItem.OnActionExpandListener, ActionMode.Callback, SearchView.OnQueryTextListener,
         NetworkThread.OnNetworkThreadReturnListener, SwipeRefreshLayout.OnRefreshListener,
         View.OnClickListener, StudentAdapter.StudentAdapterListener {
-
-    public static final int TURN_ON_BLUETOOTH_REQUEST_CODE = 0x000001;
 
     private FrameLayout fl_main;
 
@@ -252,80 +250,9 @@ public class SetStudentsActivity extends AppCompatActivity implements
         checkBluetooth();
     }
 
-    private void checkBluetooth() {
-        int permission =
-                PermissionChecker.checkCallingOrSelfPermission(this, Manifest.permission.BLUETOOTH);
-        DialogInterface.OnClickListener exit_listener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                finish();
-                MyApplication.getInstance().exit();
-            }
-        };
-        if(PackageManager.PERMISSION_GRANTED != permission) {
-
-            AlertDialog alertDialog = new AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.system_permission))
-                    .setMessage(getString(R.string.no_bt_permission))
-                    .setPositiveButton(getString(R.string.ok),exit_listener)
-                    .setCancelable(false)
-                    .create();
-            alertDialog.show();
-        }else {
-            //
-            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            if(bluetoothAdapter == null) {
-                //no adapter
-                AlertDialog alertDialog = new AlertDialog.Builder(this)
-                        .setTitle(getString(R.string.system_hardware))
-                        .setMessage(getString(R.string.no_bluetooth_hardware))
-                        .setPositiveButton(getString(R.string.ok),exit_listener)
-                        .setCancelable(false)
-                        .create();
-                alertDialog.show();
-            }else {
-                // check bluetooth is open ?
-                if(!bluetoothAdapter.isEnabled()) {
-                    AlertDialog.OnClickListener listener = new AlertDialog.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case DialogInterface.BUTTON_NEUTRAL:
-                                    gotoSystemBluetoothUI();
-                                    break;
-                                case DialogInterface.BUTTON_NEGATIVE:
-                                    finish();
-                                    break;
-                                case DialogInterface.BUTTON_POSITIVE:
-                                    checkBluetooth();
-                                    break;
-                            }
-                        }
-                    };
-                    AlertDialog alertDialog = new AlertDialog.Builder(this)
-                            .setTitle(R.string.system_hardware)
-                            .setMessage(R.string.not_turn_on_the_bt_notification)
-                            .setNeutralButton(R.string.to_turn_on_bt,listener)
-                            .setNegativeButton(R.string.back,listener)
-                            .setPositiveButton(R.string.retry,listener)
-                            .setCancelable(false)
-                            .create();
-                    alertDialog.show();
-                }else {
-                    readAllUsersDataFromServer(0);
-                }
-            }
-        }
-    }
-
-    private void gotoSystemBluetoothUI() {
-        Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-        try {
-            startActivityForResult(enableBtIntent, TURN_ON_BLUETOOTH_REQUEST_CODE);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    @Override
+    public void isBluetoothOpen() {
+        readAllUsersDataFromServer(0);
     }
 
 
@@ -335,8 +262,7 @@ public class SetStudentsActivity extends AppCompatActivity implements
             // catch the turn on bt req
             if(resultCode == RESULT_OK) {
                 // go to next phase
-//                readAllUsersDataFromServer();
-                Log.e("test","go back");
+                readAllUsersDataFromServer(0);
             } else {
                 checkBluetooth();
             }
