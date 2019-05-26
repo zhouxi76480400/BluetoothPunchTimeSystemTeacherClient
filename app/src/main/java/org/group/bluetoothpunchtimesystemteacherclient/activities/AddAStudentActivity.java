@@ -355,12 +355,12 @@ public class AddAStudentActivity extends AppCompatActivity implements View.OnCli
     }
 
     @Override
-    public void onNetworkThreadGetDataSuccessful(Response response) {
+    public void onNetworkThreadGetDataSuccessful(Class clazz, Response response) {
         String data = null;
         try {
             data = response.body().string();
         } catch (IOException e) {
-            onNetworkThreadGetDataFailed(NetworkThread.STATUS_CODE_REMOTE_SERVER_PROBLEM);
+            onNetworkThreadGetDataFailed(clazz, NetworkThread.STATUS_CODE_REMOTE_SERVER_PROBLEM);
             e.printStackTrace();
             return;
         }
@@ -373,12 +373,12 @@ public class AddAStudentActivity extends AppCompatActivity implements View.OnCli
                 id = Integer.valueOf(jsonObject.getString("id"));
             }
         } catch (JSONException e) {
-            onNetworkThreadGetDataFailed(NetworkThread.STATUS_CODE_REMOTE_SERVER_PROBLEM);
+            onNetworkThreadGetDataFailed(clazz, NetworkThread.STATUS_CODE_REMOTE_SERVER_PROBLEM);
             e.printStackTrace();
             return;
         }
         if(status_code != StatusCodeList.STATUS_CODE_OK) {
-            onNetworkThreadGetDataFailed(status_code);
+            onNetworkThreadGetDataFailed(clazz, status_code);
             return;
         }
         if(!is_edit)
@@ -404,7 +404,7 @@ public class AddAStudentActivity extends AppCompatActivity implements View.OnCli
     }
 
     @Override
-    public void onNetworkThreadGetDataFailed(int statusCode) {
+    public void onNetworkThreadGetDataFailed(Class clazz, int statusCode) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

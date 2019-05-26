@@ -3,27 +3,11 @@ package org.group.bluetoothpunchtimesystemteacherclient.network;
 import android.util.Log;
 
 import org.group.bluetoothpunchtimesystemteacherclient.MyApplication;
-
-import java.io.IOException;
-
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.Response;
 
 public class GetAllUsersThread extends NetworkThread {
 
     private long lastNumber;
-
-    private OnNetworkThreadReturnListener listener;
-
-    public void setOnNetworkThreadReturnListener(OnNetworkThreadReturnListener newListener) {
-        this.listener = newListener;
-    }
-
-    public OnNetworkThreadReturnListener getListener() {
-        return this.listener;
-    }
 
     public GetAllUsersThread(int lastNumber) {
         super();
@@ -55,12 +39,12 @@ public class GetAllUsersThread extends NetworkThread {
         Response response = APIClass.getAllUsers(lastNumber);
         if(listener != null) {
             if(response != null) {
-                listener.onNetworkThreadGetDataSuccessful(response);
+                listener.onNetworkThreadGetDataSuccessful(getClass(),response);
             }else {
                 int code = STATUS_CODE_NO_NETWORK;
                 if(MyApplication.getInstance().isNetworkOn())
                     code = STATUS_CODE_REMOTE_SERVER_PROBLEM;
-                listener.onNetworkThreadGetDataFailed(code);
+                listener.onNetworkThreadGetDataFailed(getClass(),code);
             }
         }
     }

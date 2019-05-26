@@ -232,6 +232,7 @@ public class StudentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             int position = getLayoutPosition();
+            Log.e("test","onCheckedChanged:"+getLayoutPosition()+","+isChecked);
             selectedMap.put(position,isChecked);
         }
     }

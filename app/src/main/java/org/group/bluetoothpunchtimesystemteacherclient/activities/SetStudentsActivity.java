@@ -1,6 +1,7 @@
 package org.group.bluetoothpunchtimesystemteacherclient.activities;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -41,6 +42,7 @@ import org.group.bluetoothpunchtimesystemteacherclient.network.NetworkThread;
 import org.group.bluetoothpunchtimesystemteacherclient.network.RemoveUserThread;
 import org.group.bluetoothpunchtimesystemteacherclient.network.StatusCodeList;
 import org.group.bluetoothpunchtimesystemteacherclient.objects.GetUserReturnPOJO;
+import org.group.bluetoothpunchtimesystemteacherclient.objects.ReturnPOJO;
 import org.group.bluetoothpunchtimesystemteacherclient.objects.StudentInformationObject;
 
 import java.io.IOException;
@@ -87,11 +89,16 @@ public class SetStudentsActivity extends AppCompatActivity implements
 
     private boolean isShowActionModeNow;
 
+    private List<Integer> remove_position_list;
+
+    private ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_students);
         dataSource = new ArrayList<>();
+        remove_position_list = new ArrayList<>();
         initView();
     }
 
@@ -163,7 +170,6 @@ public class SetStudentsActivity extends AppCompatActivity implements
         if(menuItem.getItemId() == R.id.menu_remove_users_ok) {
 //            actionMode.finish();
             removeUsersFromServer();
-//            onActionItemHideChangeUI();
         }
         return true;
     }
@@ -240,6 +246,9 @@ public class SetStudentsActivity extends AppCompatActivity implements
                         readAllUsersDataFromServer(getLastId());
                     }
                 });
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
+        progressDialog.setTitle(getString(R.string.remove_users_hint));
         checkBluetooth();
     }
 
@@ -426,7 +435,7 @@ public class SetStudentsActivity extends AppCompatActivity implements
      * need request network to download all student data
      */
     private void readAllUsersDataFromServer(int last_number) {
-        if(!isRequestServerNow && !isShowActionModeNow) {
+        if(!isRequestServerNow) {
             if(!MyApplication.getInstance().isNetworkOn()) {
                 if(refresh_layout.isRefreshing()) {
                     refresh_layout.setRefreshing(false);
@@ -494,6 +503,7 @@ public class SetStudentsActivity extends AppCompatActivity implements
      * must push to server
      */
     private void removeUsersFromServer() {
+        remove_position_list.clear();
         List<Integer> removeList = new ArrayList<>();
         // copy a new one
         Map<Integer,Boolean> tmp = adapter.getSelectedMap();
@@ -502,54 +512,83 @@ public class SetStudentsActivity extends AppCompatActivity implements
             Integer integer = (Integer) iterator.next();
             Boolean aBoolean = tmp.get(integer);
             if(aBoolean) {
-                removeList.add((int) dataSource.get(integer).id);
+                remove_position_list.add(integer);
+                int remove_id = (int) dataSource.get(integer).id;
+                Log.e("test","準備刪除:"+remove_id);
+                removeList.add(remove_id);
             }
         }
         // send to server
         isRequestServerNow = true;
         RemoveUserThread removeUserThread = new RemoveUserThread(removeList);
+        removeUserThread.setOnNetworkThreadReturnListener(this);
+        progressDialog.show();
         removeUserThread.start();
-
-
-
-
-//        adapter.cleanMap();
     }
 
     @Override
-    public void onNetworkThreadGetDataSuccessful(Response data) {
+    public void onNetworkThreadGetDataSuccessful(Class clazz, Response data) {
         int code = data.code();
         if(code == HttpURLConnection.HTTP_OK) {
             String json = null;
             try {
                 json = data.body().string();
             } catch (IOException e) {
-                onNetworkThreadGetDataFailed(StatusCodeList.STATUS_CODE_JSON_PARAMETER_NOT_EQUALS);
+                onNetworkThreadGetDataFailed(clazz,StatusCodeList.STATUS_CODE_JSON_PARAMETER_NOT_EQUALS);
                 e.printStackTrace();
             }
-            decodeJSON(json);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    changeNetworkFlag();
-                }
-            });
+            if(clazz == GetAllUsersThread.class) {
+                decodeJSON(json);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        changeNetworkFlag();
+                    }
+                });
+            }else if(clazz == RemoveUserThread.class) {
+                ReturnPOJO returnPOJO = new Gson().fromJson(json,ReturnPOJO.class);
+                Log.e("test",returnPOJO.s);
+                isRequestServerNow = false;
+                // close select
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = remove_position_list.size() - 1 ; i>=0 ; i -- ) {
+                            int remove_position = remove_position_list.get(i);
+                            Log.e("刪除的位置:",remove_position+"");
+                            dataSource.remove(remove_position);
+                            adapter.notifyItemRemoved(remove_position);
+                        }
+                        progressDialog.dismiss();
+                        adapter.getSelectedMap().clear();
+                        actionMode.finish();
+                        onActionItemHideChangeUI();
+                        // if data source less than 1 page, need to get the next page
+                        onLoad();
+                    }
+                });
+            }
         }else {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    onNetworkThreadGetDataFailed(code);
+                    onNetworkThreadGetDataFailed(clazz,code);
                 }
             });
         }
     }
 
     @Override
-    public void onNetworkThreadGetDataFailed(int statusCode) {
+    public void onNetworkThreadGetDataFailed(Class clazz, int statusCode) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                onNetworkThreadGetDataFailedMainThread(statusCode);
+                if(clazz == GetAllUsersThread.class) {
+                    onNetworkThreadGetDataFailedMainThread(statusCode);
+                }else if(clazz == RemoveUserThread.class) {
+                    progressDialog.dismiss();
+                    isRequestServerNow = false;
+                }
             }
         });
     }
@@ -624,10 +663,7 @@ public class SetStudentsActivity extends AppCompatActivity implements
     @Override
     public void onLoad() {
         if(!isRequestServerNow) {
-            Log.e("test","aaaaaaa");
             int id = (int) dataSource.get(dataSource.size() - 1).id;
-            Log.e("test","aaaa:"+id);
-
             readAllUsersDataFromServer(id);
         }
     }

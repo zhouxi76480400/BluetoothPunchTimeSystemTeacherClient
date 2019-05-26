@@ -45,6 +45,8 @@
     <string name="get_student_progress_hint">Loading now …</string>
     <string name="no_student">No Student</string>
     <string name="no_more">No More</string>
+    <string name="remove_users_hint">Remove User(s) now...</string>
+
 
 
 </resources>
