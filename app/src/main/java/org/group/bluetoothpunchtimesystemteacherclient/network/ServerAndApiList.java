@@ -7,8 +7,9 @@ public class ServerAndApiList implements Serializable {
     /**
      * WebServer Address
      */
-//    public static final String SERVER_ADDRESS = "http://192.168.0.115:8080/s/";
-    public static final String SERVER_ADDRESS = "http://192.168.50.44:8080/s/";
+    public static final String SERVER_ADDRESS = "http://192.168.1.43:8080/s/";
+//    public static final String SERVER_ADDRESS = "http://172.19.1.20:8080/s/";
+//    public static final String SERVER_ADDRESS = "http://192.168.50.44:8080/s/";
 
     /**
      * Get All Users
@@ -24,6 +25,11 @@ public class ServerAndApiList implements Serializable {
      * Remove Users
      */
     public static final String API_REMOVE_USERS = "removeusrs";
+
+    /**
+     * create new session
+     */
+    public static final String API_CREATE_NEW_SESSION = "cs";
 
     /**
      * Use This Method To Get Api Address

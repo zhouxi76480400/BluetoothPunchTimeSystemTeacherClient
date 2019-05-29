@@ -60,6 +60,8 @@
     <string name="set_lesson_name">Set Lesson Name:</string>
     <string name="create">Create</string>
     <string name="quit">Quit</string>
+    <string name="please_fill_the_name">Please fill the name</string>
+    <string name="create_new_session_now">Create new session now…</string>
 
 
 </resources>

@@ -10,11 +10,28 @@
         <item>180 Minutes</item>
     </string-array>
 
+    <integer-array name="array_time_integer">
+        <item>30</item>
+        <item>45</item>
+        <item>60</item>
+        <item>90</item>
+        <item>120</item>
+        <item>150</item>
+        <item>180</item>
+    </integer-array>
+
     <string-array name="array_scan_times">
         <item>3 times</item>
         <item>5 times</item>
         <item>7 times</item>
         <item>9 times</item>
     </string-array>
+
+    <integer-array name="array_scan_times_integer">
+        <item>3</item>
+        <item>5</item>
+        <item>7</item>
+        <item>9</item>
+    </integer-array>
     
 </resources>

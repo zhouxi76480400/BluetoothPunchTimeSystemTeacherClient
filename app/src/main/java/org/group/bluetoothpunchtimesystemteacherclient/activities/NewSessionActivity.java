@@ -2,6 +2,8 @@ package org.group.bluetoothpunchtimesystemteacherclient.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,8 +20,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.group.bluetoothpunchtimesystemteacherclient.R;
+import org.group.bluetoothpunchtimesystemteacherclient.network.CreateSessionThread;
+import org.group.bluetoothpunchtimesystemteacherclient.objects.CreateSessionPOJO;
 import org.group.bluetoothpunchtimesystemteacherclient.views.RadarView;
 
 public class NewSessionActivity extends MyActivity {
@@ -33,6 +38,8 @@ public class NewSessionActivity extends MyActivity {
     }
 
     private boolean isNewSession;
+
+    private ProgressDialog waitingForSessionCreateDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -145,20 +152,20 @@ public class NewSessionActivity extends MyActivity {
 
 
     private void showSelectProgramDialog() {
+        View view = LayoutInflater.from(this).inflate(R.layout.layout_select_program,null);
         DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
-
+                        getDataFromDialog(view);
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
-                            onBackPressed();
+                        onBackPressed();
                         break;
                 }
             }
         };
-        View view = LayoutInflater.from(this).inflate(R.layout.layout_select_program,null);
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.set_program))
                 .setView(view)
@@ -185,7 +192,7 @@ public class NewSessionActivity extends MyActivity {
         number_picker_set_frequency.setMaxValue(displayedValuesFrequency.length - 1);
         //
         EditText et_lesson_name = view.findViewById(R.id.et_lesson_name);
-
+        //
 
 
         alertDialog.show();
@@ -196,6 +203,38 @@ public class NewSessionActivity extends MyActivity {
                 showIME();
             }
         },200);
+    }
+
+    private void getDataFromDialog(View view) {
+        NumberPicker number_picker_set_time = view.findViewById(R.id.number_picker_set_time);
+        NumberPicker number_picker_set_frequency =
+                view.findViewById(R.id.number_picker_set_frequency);
+        EditText et_lesson_name = view.findViewById(R.id.et_lesson_name);
+        //
+        String name = et_lesson_name.getText().toString();
+        boolean isNameOK = !name.isEmpty();
+        int[] array_time = getResources().getIntArray(R.array.array_time_integer);
+        int time = array_time[number_picker_set_time.getValue()];
+        int[] array_scan_times = getResources().getIntArray(R.array.array_scan_times_integer);
+        int frequency = array_scan_times[number_picker_set_frequency.getValue()];
+        if(isNameOK) {
+            CreateSessionPOJO createSessionPOJO = new CreateSessionPOJO();
+            createSessionPOJO.name = name;
+            createSessionPOJO.time = time;
+            createSessionPOJO.frequency = frequency;
+            CreateSessionThread createSessionThread = new CreateSessionThread(createSessionPOJO);
+            if(waitingForSessionCreateDialog == null) {
+                waitingForSessionCreateDialog = new ProgressDialog(this);
+                waitingForSessionCreateDialog.setCancelable(false);
+                waitingForSessionCreateDialog.setMessage(getString(R.string.create_new_session_now));
+            }
+//            waitingForSessionCreateDialog.show();
+            createSessionThread.start();
+        }else {
+            Toast.makeText(this,
+                    getString(R.string.please_fill_the_name),Toast.LENGTH_SHORT).show();
+            showSelectProgramDialog();
+        }
     }
 
     protected void showIME() {
