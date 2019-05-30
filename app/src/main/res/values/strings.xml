@@ -62,6 +62,10 @@
     <string name="quit">Quit</string>
     <string name="please_fill_the_name">Please fill the name</string>
     <string name="create_new_session_now">Create new session now…</string>
+    <string name="session_info">Lesson name: %s\nLesson create time: %s\nLesson time: %d minutes, scan frequency: %d</string>
+    <string name="now_time_hint">Now:%d/%d seconds</string>
+    <string name="scan_times_hint">Next scan remaining:%d seconds (%d/%d)</string>
+
 
 
 </resources>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="array_time">
+        <item>1 Minutes</item>
         <item>30 Minutes</item>
         <item>45 Minutes</item>
         <item>60 Minutes</item>
@@ -11,6 +12,7 @@
     </string-array>
 
     <integer-array name="array_time_integer">
+        <item>1</item>
         <item>30</item>
         <item>45</item>
         <item>60</item>

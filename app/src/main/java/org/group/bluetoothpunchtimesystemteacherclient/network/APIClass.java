@@ -5,6 +5,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 
 import org.group.bluetoothpunchtimesystemteacherclient.objects.CreateSessionPOJO;
+import org.group.bluetoothpunchtimesystemteacherclient.objects.UpdateSessionDataPOJO;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -109,6 +110,27 @@ public class APIClass {
         Request request = new Request.Builder()
                 .post(requestBody)
                 .url(ServerAndApiList.getFullAPIAddress(ServerAndApiList.API_CREATE_NEW_SESSION))
+                .build();
+        Call call = okHttpClient.newCall(request);
+        try {
+            Response response = call.execute();
+            return response;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Response updateSessionData(UpdateSessionDataPOJO pojo) {
+        Gson gson = new Gson();
+        String json = gson.toJson(pojo);
+        OkHttpClient okHttpClient = new OkHttpClient();
+        Map<String,String> kv = new HashMap<>();
+        kv.put("d",json);
+        RequestBody requestBody = getRequestBody(kv);
+        Request request = new Request.Builder()
+                .post(requestBody)
+                .url(ServerAndApiList.getFullAPIAddress(ServerAndApiList.API_UPDATE_SESSION_DATA))
                 .build();
         Call call = okHttpClient.newCall(request);
         try {

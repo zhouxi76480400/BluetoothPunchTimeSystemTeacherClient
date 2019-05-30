@@ -32,6 +32,11 @@ public class ServerAndApiList implements Serializable {
     public static final String API_CREATE_NEW_SESSION = "cs";
 
     /**
+     * update session data
+     */
+    public static final String API_UPDATE_SESSION_DATA = "us";
+
+    /**
      * Use This Method To Get Api Address
      * @param apiName
      * @return

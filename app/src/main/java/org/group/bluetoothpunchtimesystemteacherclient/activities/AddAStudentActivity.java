@@ -251,7 +251,7 @@ public class AddAStudentActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    private String removeColonFromMACAddress(String mac) {
+    public static String removeColonFromMACAddress(String mac) {
         if(mac != null) {
             String[] array = mac.split(":");
             StringBuilder stringBuilder = new StringBuilder();

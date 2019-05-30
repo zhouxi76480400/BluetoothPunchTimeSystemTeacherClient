@@ -230,6 +230,11 @@ public class RadarView extends View {
         this.invalidate();
     }
 
+    public void cleanPoint() {
+        mPointCount = 0;
+        this.invalidate();
+    }
+
     /**
      * TODO<解析获取控件宽高>
      *
