@@ -41,6 +41,10 @@
 
         <activity android:name=".activities.NewSessionActivity"/>
 
+        <activity android:name=".activities.AllSessionsListActivity"/>
+
+        <activity android:name=".activities.SessionInformationActivity"/>
+
     </application>
 
 </manifest>

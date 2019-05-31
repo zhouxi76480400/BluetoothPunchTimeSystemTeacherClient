@@ -27,6 +27,47 @@ public class APIClass {
     private static final MediaType FORM_CONTENT_TYPE
             = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
 
+    public static Response getSessionInfo(int sid) {
+        OkHttpClient okHttpClient = new OkHttpClient();
+        Map<String,String> kv = new HashMap<>();
+        kv.put("id",String.valueOf(sid));
+        RequestBody requestBody = getRequestBody(kv);
+        Request request = new Request.Builder()
+                .url(ServerAndApiList.getFullAPIAddress(ServerAndApiList.API_GET_SESSION_INFO))
+                .post(requestBody)
+                .build();
+        Call call = okHttpClient.newCall(request);
+        try {
+            Response response = call.execute();
+            return response;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Response getSessions(int last_sid) {
+        OkHttpClient okHttpClient = new OkHttpClient();
+        Map<String,String> kv = new HashMap<>();
+        if(last_sid > 0) {
+            kv.put("l",String.valueOf(last_sid));
+//            Log.e("test","l:"+last_sid);
+        }
+        RequestBody requestBody = getRequestBody(kv);
+        Request request = new Request.Builder()
+                .url(ServerAndApiList.getFullAPIAddress(ServerAndApiList.API_GET_SESSIONS))
+                .post(requestBody)
+                .build();
+        Call call = okHttpClient.newCall(request);
+        try {
+            Response response = call.execute();
+            return response;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     /**
      * get All User
      * @param lastNumber

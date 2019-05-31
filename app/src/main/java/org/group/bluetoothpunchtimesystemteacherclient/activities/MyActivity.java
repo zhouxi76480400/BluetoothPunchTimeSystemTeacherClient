@@ -147,7 +147,7 @@ public class MyActivity extends AppCompatActivity {
                             .setTitle(R.string.system_hardware)
                             .setMessage(R.string.not_turn_on_the_bt_notification)
                             .setNeutralButton(R.string.to_turn_on_bt,listener)
-                            .setNegativeButton(R.string.back,listener)
+                            .setNegativeButton(R.string.txt_back,listener)
                             .setPositiveButton(R.string.retry,listener)
                             .setCancelable(false)
                             .create();

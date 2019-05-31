@@ -9,7 +9,6 @@
     <string name="no_bluetooth_hardware">No Bluetooth Hardware</string>
     <string name="not_turn_on_the_bt_notification">Your Bluetooth is off, make sure your Bluetooth is on.</string>
     <string name="to_turn_on_bt">Go to turn on</string>
-    <string name="back">Back</string>
     <string name="retry">Retry</string>
     <string name="ok">OK</string>
     <string name="add_a_student">Add a student</string>
@@ -65,7 +64,11 @@
     <string name="session_info">Lesson name: %s\nLesson create time: %s\nLesson time: %d minutes, scan frequency: %d</string>
     <string name="now_time_hint">Now:%d/%d seconds</string>
     <string name="scan_times_hint">Next scan remaining:%d seconds (%d/%d)</string>
-
+    <string name="finish_hint">Is finish punch time now.</string>
+    <string name="txt_back">back</string>
+    <string name="no_record">No Record</string>
+    <string name="time_and_frequency">Time %d minutes, Frequency %d</string>
+    <string name="waiting">Waiting …</string>
 
 
 </resources>

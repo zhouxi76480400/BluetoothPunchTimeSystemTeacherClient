@@ -1,7 +1,6 @@
 package org.group.bluetoothpunchtimesystemteacherclient.activities;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -13,6 +12,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -425,6 +425,28 @@ public class NewSessionActivity extends MyActivity implements
     private void notifyFinish() {
         Log.e("test","notifyFinish");
         tv_now_time.setText("");
+        radarView.cleanPoint();
+        radarView.setSearching(false);
+        showFinishDialog();
+    }
+
+    private void showFinishDialog() {
+        DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        finish();
+                        break;
+                }
+            }
+        };
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setMessage(getString(R.string.finish_hint))
+                .setPositiveButton(getString(R.string.txt_back),onClickListener)
+                .create();
+        alertDialog.setCancelable(false);
+        alertDialog.show();
     }
 
     private int now_scan_time;

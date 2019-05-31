@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -65,7 +66,15 @@ public class MainActivity extends MyActivity implements View.OnClickListener {
             case R.id.ll_start_new_session:
                 onNewSessionButtonPressed();
                 break;
+            case R.id.ll_show_all_session:
+                gotoAllSessionListActivity();
+                break;
         }
+    }
+
+    private void gotoAllSessionListActivity() {
+        Intent intent = new Intent(this, AllSessionsListActivity.class);
+        startActivity(intent);
     }
 
     private void gotoSetStudentsActivity() {

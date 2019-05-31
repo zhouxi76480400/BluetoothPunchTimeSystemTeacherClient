@@ -37,6 +37,13 @@ public class ServerAndApiList implements Serializable {
     public static final String API_UPDATE_SESSION_DATA = "us";
 
     /**
+     *
+     */
+    public static final String API_GET_SESSIONS = "gs";
+
+    public static final String API_GET_SESSION_INFO = "gi";
+
+    /**
      * Use This Method To Get Api Address
      * @param apiName
      * @return
