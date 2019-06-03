@@ -7,7 +7,8 @@ public class ServerAndApiList implements Serializable {
     /**
      * WebServer Address
      */
-    public static final String SERVER_ADDRESS = "http://192.168.1.43:8080/s/";
+    public static final String SERVER_ADDRESS = "http://172.19.1.19:8080/s/";
+//    public static final String SERVER_ADDRESS = "http://192.168.1.43:8080/s/";
 //    public static final String SERVER_ADDRESS = "http://172.19.1.20:8080/s/";
 //    public static final String SERVER_ADDRESS = "http://192.168.50.44:8080/s/";
 
